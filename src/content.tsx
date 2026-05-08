@@ -47,6 +47,7 @@ const CommandPaletteUI = () => {
   const hideMenuTimeoutRef = useRef<number | null>(null)
   const highlightedRangesRef = useRef<Range[]>([])
   const ignoreMutationsRef = useRef(false)
+  const highlightRef = useRef<() => void>(() => {})
   const storage = useMemo(() => new Storage({ area: "local" }), [])
 
   // Inject highlight styling into main document
@@ -107,13 +108,13 @@ const CommandPaletteUI = () => {
   const [storedCommands, setStoredCommands] = useState<StoredPrompt[]>([])
   const [hasLoadedCommands, setHasLoadedCommands] = useState(false)
 
-  // Helper: find all elements with contenteditable="true", including inside shadow roots
+  // Helper: find all elements with contenteditable (any value except "false"), including inside shadow roots
   const getAllContentEditables = () => {
     const results: Element[] = []
 
     const collectFromRoot = (root: Document | ShadowRoot) => {
       try {
-        results.push(...Array.from(root.querySelectorAll('[contenteditable="true"]')))
+        results.push(...Array.from(root.querySelectorAll('[contenteditable]:not([contenteditable="false"])')))
         const all = Array.from(root.querySelectorAll('*'))
         for (const el of all) {
           const sr = (el as HTMLElement).shadowRoot
@@ -186,6 +187,10 @@ const CommandPaletteUI = () => {
             console.error("Highlight API failed, falling back to span wrapper:", err)
           }
         }
+
+        // No matches found — clear any stale CSS highlights
+        ; (CSS as any).highlights.delete("command-insert")
+        highlightedRangesRef.current = []
       }
 
       // Fallback: wrap matched tokens in span.command-insert-fallback
@@ -284,6 +289,8 @@ const CommandPaletteUI = () => {
       console.error("Failed to highlight existing commands (unexpected):", error)
     }
   }
+
+  highlightRef.current = highlightExistingCommands
 
   const replaceCommandsWithPrompts = () => {
     const replaceText = (text: string) => {
@@ -452,7 +459,8 @@ const CommandPaletteUI = () => {
 
     const observer = new MutationObserver(() => {
       detectTheme()
-      highlightExistingCommands()
+      if (ignoreMutationsRef.current) return
+      highlightRef.current()
     })
     observer.observe(document.documentElement, {
       attributes: true,
@@ -466,16 +474,16 @@ const CommandPaletteUI = () => {
     mediaQuery.addEventListener("change", detectTheme)
 
     setTimeout(() => {
-      highlightExistingCommands()
+      highlightRef.current()
     }, 500)
 
-    const debouncedHighlight = debounce(() => highlightExistingCommands(), 80)
+    const debouncedHighlight = debounce(() => highlightRef.current(), 80)
 
     // Re-run highlighter on load, focus changes, visibility and body mutations
-    const onLoad = () => setTimeout(() => highlightExistingCommands(), 0)
-    const onFocusOut = () => setTimeout(() => highlightExistingCommands(), 0)
+    const onLoad = () => setTimeout(() => highlightRef.current(), 0)
+    const onFocusOut = () => setTimeout(() => highlightRef.current(), 0)
     const onVisibility = () => {
-      if (document.visibilityState === "visible") setTimeout(() => highlightExistingCommands(), 50)
+      if (document.visibilityState === "visible") setTimeout(() => highlightRef.current(), 50)
     }
 
     window.addEventListener("load", onLoad)
@@ -530,7 +538,7 @@ const CommandPaletteUI = () => {
         const nextCommands = Array.isArray(change.newValue) ? change.newValue : []
         setStoredCommands(nextCommands)
         setHasLoadedCommands(true)
-        setTimeout(() => highlightExistingCommands(), 0)
+        setTimeout(() => highlightRef.current(), 0)
       }
     })
 
@@ -556,7 +564,7 @@ const CommandPaletteUI = () => {
       if (event.key === "Enter" && !event.shiftKey && !event.altKey && !event.isComposing) {
         if (
           target.tagName === "TEXTAREA" ||
-          target.contentEditable === "true" ||
+          target.isContentEditable ||
           target.tagName === "INPUT"
         ) {
           replaceCommandsWithPrompts()
@@ -567,7 +575,7 @@ const CommandPaletteUI = () => {
         if (
           target.tagName === "INPUT" ||
           target.tagName === "TEXTAREA" ||
-          target.contentEditable === "true"
+          target.isContentEditable
         ) {
           event.preventDefault()
           event.stopPropagation()
