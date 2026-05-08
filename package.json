@@ -1,15 +1,16 @@
 {
-  "name": "quick-prmpt-3",
-  "displayName": "Quick prmpt 3",
+  "name": "skillprompts",
+  "displayName": "Skill Prompts Extension",
   "version": "0.0.1",
-  "description": "A basic Plasmo extension.",
-  "author": "Plasmo Corp. <foss@plasmo.com>",
+  "description": "A Chrome extension to manage and use skill prompts for ChatGPT.",
+  "author": "Adem Kouki <ademkingnew@gmail.com>",
   "scripts": {
     "dev": "plasmo dev",
     "build": "plasmo build",
     "package": "plasmo package"
   },
   "dependencies": {
+    "@plasmohq/storage": "^1.15.0",
     "plasmo": "0.90.5",
     "react": "18.2.0",
     "react-dom": "18.2.0",
@@ -27,7 +28,8 @@
   },
   "manifest": {
     "host_permissions": [
-      "https://*/*"
+      "https://chat.openai.com/*",
+      "https://chatgpt.com/*"
     ]
   }
 }
