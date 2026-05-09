@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from "react"
 import type { FC } from "react"
+import Logo from "./Logo"
 
 interface Command {
     id: string
@@ -79,11 +80,11 @@ const CommandPalette: FC<Props> = ({
             className={centered ? "plasmo-w-fit" : "plasmo-fixed plasmo-z-[999999] plasmo-animate-in plasmo-fade-in plasmo-zoom-in-95"}
             style={!centered ? { left: position.x, top: position.y } : {}}
         >
-            <div className={`plasmo-w-[760px] plasmo-overflow-hidden plasmo-rounded-2xl plasmo-border plasmo-backdrop-blur-2xl plasmo-shadow-[0_24px_80px_rgba(0,0,0,0.45)] ${D ? "plasmo-border-white/10 plasmo-bg-neutral-950/96 plasmo-text-white" : "plasmo-border-black/10 plasmo-bg-white/95 plasmo-text-neutral-900"
+            <div className={`plasmo-w-[760px] plasmo-overflow-hidden plasmo-border plasmo-backdrop-blur-2xl plasmo-shadow-[0_24px_80px_rgba(0,0,0,0.45)] ${D ? "plasmo-border-white/10 plasmo-bg-neutral-950/96 plasmo-text-white" : "plasmo-border-black/10 plasmo-bg-white/95 plasmo-text-neutral-900"
                 }`}>
                 {/* HEADER */}
                 <div className={`plasmo-flex plasmo-items-center plasmo-gap-3 plasmo-border-b plasmo-px-3 plasmo-py-2.5 ${borderCls}`}>
-                    <div className={`plasmo-flex plasmo-h-8 plasmo-w-8 plasmo-items-center plasmo-justify-center plasmo-rounded-xl plasmo-border plasmo-text-xs plasmo-font-semibold ${D ? "plasmo-border-white/10 plasmo-bg-white/5 plasmo-text-neutral-300" : "plasmo-border-black/5 plasmo-bg-neutral-100 plasmo-text-neutral-600"
+                    <div className={`plasmo-flex plasmo-h-8 plasmo-w-8 plasmo-items-center plasmo-justify-center plasmo-border plasmo-text-xs plasmo-font-semibold ${D ? "plasmo-border-white/10 plasmo-bg-white/5 plasmo-text-neutral-300" : "plasmo-border-black/5 plasmo-bg-neutral-100 plasmo-text-neutral-600"
                         }`}>/</div>
 
                     <div className="plasmo-flex-1">
@@ -107,9 +108,9 @@ const CommandPalette: FC<Props> = ({
                     </div>
 
                     <div className={`plasmo-hidden md:plasmo-flex plasmo-items-center plasmo-gap-1 plasmo-text-xs ${textMuted}`}>
-                        <kbd className={`plasmo-rounded-md plasmo-border plasmo-px-2 plasmo-py-1 ${D ? "plasmo-border-white/10 plasmo-bg-white/5" : "plasmo-border-black/10 plasmo-bg-neutral-100"
+                        <kbd className={`plasmo-border plasmo-px-2 plasmo-py-1 ${D ? "plasmo-border-white/10 plasmo-bg-white/5" : "plasmo-border-black/10 plasmo-bg-neutral-100"
                             }`}>↑↓</kbd>
-                        <kbd className={`plasmo-rounded-md plasmo-border plasmo-px-2 plasmo-py-1 ${D ? "plasmo-border-white/10 plasmo-bg-white/5" : "plasmo-border-black/10 plasmo-bg-neutral-100"
+                        <kbd className={`plasmo-border plasmo-px-2 plasmo-py-1 ${D ? "plasmo-border-white/10 plasmo-bg-white/5" : "plasmo-border-black/10 plasmo-bg-neutral-100"
                             }`}>Enter</kbd>
                     </div>
                 </div>
@@ -125,9 +126,21 @@ const CommandPalette: FC<Props> = ({
                 <div className="plasmo-max-h-[360px] plasmo-overflow-y-auto plasmo-p-2 command-palette-scroll" style={scrollVars as React.CSSProperties}>
                     {filtered.length === 0 && (
                         <div className={`plasmo-flex plasmo-flex-col plasmo-items-center plasmo-justify-center plasmo-gap-1.5 plasmo-py-8 plasmo-text-center ${textMuted}`}>
-                            <div className="plasmo-text-2xl">⌘</div>
+                            <div className="plasmo-text-2xl">
+                                <Logo width={32} height={32} />
+                            </div>
                             <div className="plasmo-text-sm plasmo-font-medium">No commands found</div>
-                            <div className="plasmo-text-xs">Try another keyword</div>
+                            <button
+                                onClick={() => {
+                                    chrome.runtime.sendMessage({
+                                        type: "OPEN_OPTIONS"
+                                    })
+                                }}
+                                className="plasmo-inline-flex plasmo-items-center plasmo-gap-1.5 plasmo-h-8 plasmo-px-3 plasmo-text-xs plasmo-font-medium plasmo-text-[var(--text)] plasmo-bg-transparent plasmo-border plasmo-border-[var(--border)] plasmo-transition-all hover:plasmo-bg-[var(--accent-bg)] hover:plasmo-text-[var(--accent)] hover:plasmo-border-[var(--accent-border)]"
+                            >
+                                <span className="plasmo-text-base leading-none">+</span>
+                                Add Command
+                            </button>
                         </div>
                     )}
 
@@ -143,7 +156,7 @@ const CommandPalette: FC<Props> = ({
                                     ref={active ? selectedItemRef : null}
                                     onMouseEnter={() => setSelectedIndex(index)}
                                     onMouseDown={(e) => { e.preventDefault(); selectCommand(index) }}
-                                    className={`plasmo-group plasmo-relative plasmo-flex plasmo-w-full plasmo-items-center plasmo-gap-3 plasmo-overflow-hidden plasmo-rounded-xl plasmo-border plasmo-px-3 plasmo-py-2 plasmo-text-left plasmo-transition-all plasmo-duration-200 ${activeDark
+                                    className={`plasmo-group plasmo-relative plasmo-flex plasmo-w-full plasmo-items-center plasmo-gap-3 plasmo-overflow-hidden plasmo-border plasmo-px-3 plasmo-py-2 plasmo-text-left plasmo-transition-all plasmo-duration-200 ${activeDark
                                         ? "plasmo-border-white/10 plasmo-bg-white/[0.07] plasmo-shadow-lg"
                                         : activeLight
                                             ? "plasmo-border-black/5 plasmo-bg-neutral-100"
@@ -152,9 +165,9 @@ const CommandPalette: FC<Props> = ({
                                                 : "plasmo-border-transparent hover:plasmo-bg-neutral-100/80"
                                         }`}
                                 >
-                                    {active && <div className="plasmo-absolute plasmo-inset-y-0 plasmo-left-0 plasmo-w-0.5 plasmo-rounded-full" />}
+                                    {active && <div className="plasmo-absolute plasmo-inset-y-0 plasmo-left-0 plasmo-w-0.5 " />}
 
-                                    {/* <div className={`plasmo-flex plasmo-h-8 plasmo-w-8 plasmo-shrink-0 plasmo-items-center plasmo-justify-center plasmo-rounded-xl plasmo-text-xs plasmo-font-bold ${active ? "plasmo-bg-blue-500 plasmo-text-white"
+                                    {/* <div className={`plasmo-flex plasmo-h-8 plasmo-w-8 plasmo-shrink-0 plasmo-items-center plasmo-justify-center  plasmo-text-xs plasmo-font-bold ${active ? "plasmo-bg-blue-500 plasmo-text-white"
                                         : D ? "plasmo-bg-white/5 plasmo-text-neutral-300"
                                             : "plasmo-bg-neutral-200 plasmo-text-neutral-700"
                                         }`}>
@@ -164,7 +177,7 @@ const CommandPalette: FC<Props> = ({
                                     <div className="plasmo-min-w-0 plasmo-flex-1">
                                         <div className="plasmo-flex plasmo-items-center plasmo-gap-1.5">
                                             <span className="plasmo-text-xs plasmo-font-semibold plasmo-font-mono">/{cmd.label}</span>
-                                            {/* <span className={`plasmo-rounded-full plasmo-px-1.5 plasmo-py-0 plasmo-text-[9px] plasmo-font-medium plasmo-uppercase plasmo-tracking-wide ${
+                                            {/* <span className={`plasmo-px-1.5 plasmo-py-0 plasmo-text-[9px] plasmo-font-medium plasmo-uppercase plasmo-tracking-wide ${
                                                 D ? "plasmo-bg-white/5 plasmo-text-neutral-400" : "plasmo-bg-neutral-200 plasmo-text-neutral-500"
                                             }`}>/{cmd.id}</span> */}
                                         </div>
@@ -172,7 +185,7 @@ const CommandPalette: FC<Props> = ({
                                     </div>
 
                                     <div className={`plasmo-flex plasmo-items-center plasmo-gap-1 plasmo-opacity-0 group-hover:plasmo-opacity-100 ${active ? "plasmo-opacity-100" : ""}`}>
-                                        <kbd className={`plasmo-rounded-lg plasmo-border plasmo-px-1.5 plasmo-py-0.5 plasmo-text-[9px] plasmo-font-medium ${D ? "plasmo-border-white/10 plasmo-bg-white/5 plasmo-text-neutral-300"
+                                        <kbd className={` plasmo-border plasmo-px-1.5 plasmo-py-0.5 plasmo-text-[9px] plasmo-font-medium ${D ? "plasmo-border-white/10 plasmo-bg-white/5 plasmo-text-neutral-300"
                                             : "plasmo-border-black/10 plasmo-bg-white plasmo-text-neutral-600"
                                             }`}>↵</kbd>
                                     </div>
@@ -193,7 +206,7 @@ const CommandPalette: FC<Props> = ({
                         chrome.runtime.sendMessage({
                             type: "OPEN_OPTIONS"
                         })
-                    }} className={`plasmo-font-medium plasmo-transition-colors hover:plasmo-text-blue-500 ${D ? "plasmo-text-neutral-300 hover:plasmo-text-blue-400" : "plasmo-text-neutral-500"}`}>Settings</button>
+                    }} className={`plasmo-font-medium plasmo-transition-colors hover:plasmo-text-blue-500 ${D ? "plasmo-text-neutral-300 hover:plasmo-text-blue-500" : "plasmo-text-neutral-500"}`}>+ Add Command</button>
                 </div>
             </div>
         </div>
