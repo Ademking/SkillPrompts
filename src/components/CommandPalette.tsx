@@ -70,6 +70,9 @@ const CommandPalette: FC<Props> = ({
     const borderCls = D ? "plasmo-border-white/10" : "plasmo-border-black/5"
     const textMuted = D ? "plasmo-text-neutral-500" : "plasmo-text-neutral-400"
     const textMuted2 = D ? "plasmo-text-neutral-400" : "plasmo-text-neutral-500"
+    const scrollVars = D
+        ? { "--scroll-track": "rgba(255,255,255,0.04)", "--scroll-thumb": "rgba(255,255,255,0.16)" }
+        : { "--scroll-track": "rgba(0,0,0,0.04)", "--scroll-thumb": "rgba(0,0,0,0.12)" }
 
     return (
         <div
@@ -151,7 +154,7 @@ const CommandPalette: FC<Props> = ({
                                     {active && <div className="plasmo-absolute plasmo-inset-y-0 plasmo-left-0 plasmo-w-0.5 plasmo-rounded-full" />}
 
                                     <div className={`plasmo-flex plasmo-h-8 plasmo-w-8 plasmo-shrink-0 plasmo-items-center plasmo-justify-center plasmo-rounded-xl plasmo-text-xs plasmo-font-bold ${
-                                        active ? "plasmo-bg-emerald-500 plasmo-text-white"
+                                        active ? "plasmo-bg-blue-500 plasmo-text-white"
                                             : D ? "plasmo-bg-white/5 plasmo-text-neutral-300"
                                                 : "plasmo-bg-neutral-200 plasmo-text-neutral-700"
                                     }`}>

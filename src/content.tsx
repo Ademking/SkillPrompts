@@ -58,31 +58,31 @@ const CommandPaletteUI = () => {
     style.id = "command-highlight-styles"
     style.textContent = `
       ::highlight(command-insert) {
-  background-color: rgba(16, 185, 129, 0.18); /* soft emerald glow */
-  color: #34d399; /* bright mint green text */
+  background-color: rgba(20, 142, 255, 0.18);
+  color: #148EFF;
 
-  text-decoration: underline 2px solid rgba(52, 211, 153, 0.7);
+  text-decoration: underline 2px solid rgba(20, 142, 255, 0.7);
   text-underline-offset: 3px;
 
-  text-shadow: 0 0 6px rgba(52, 211, 153, 0.35);
+  text-shadow: 0 0 6px rgba(20, 142, 255, 0.35);
 
   border-radius: 4px;
   padding: 0 2px;
 
-  box-shadow: 0 0 0 1px rgba(16, 185, 129, 0.25) inset;
+  box-shadow: 0 0 0 1px rgba(20, 142, 255, 0.25) inset;
   transition: all 0.2s ease-in-out;
 }
 
 /* Fallback style when ::highlight is unavailable — span wrappers */
 .command-insert-fallback {
-  background-color: rgba(16, 185, 129, 0.18) !important;
-  color: #34d399 !important;
-  text-decoration: underline 2px solid rgba(52, 211, 153, 0.7) !important;
+  background-color: rgba(20, 142, 255, 0.18) !important;
+  color: #148EFF !important;
+  text-decoration: underline 2px solid rgba(20, 142, 255, 0.7) !important;
   text-underline-offset: 3px !important;
-  text-shadow: 0 0 6px rgba(52, 211, 153, 0.35) !important;
+  text-shadow: 0 0 6px rgba(20, 142, 255, 0.35) !important;
   border-radius: 4px !important;
   padding: 0 2px !important;
-  box-shadow: 0 0 0 1px rgba(16, 185, 129, 0.25) inset !important;
+  box-shadow: 0 0 0 1px rgba(20, 142, 255, 0.25) inset !important;
 }
     `
     document.head.appendChild(style)
@@ -262,16 +262,16 @@ const CommandPaletteUI = () => {
                 span.className = "command-insert-fallback"
                 span.textContent = frag.content
                 // Apply inline styles as backup (in case CSS class doesn't work in shadow DOM)
-                span.style.backgroundColor = "rgba(16, 185, 129, 0.18)"
-                span.style.color = "#34d399"
-                span.style.textDecoration = "underline 2px solid rgba(52, 211, 153, 0.7)"
-                span.style.textDecorationColor = "rgba(52, 211, 153, 0.7)"
+                span.style.backgroundColor = "rgba(20, 142, 255, 0.18)"
+                span.style.color = "#148EFF"
+                span.style.textDecoration = "underline 2px solid rgba(20, 142, 255, 0.7)"
+                span.style.textDecorationColor = "rgba(20, 142, 255, 0.7)"
                 span.style.textDecorationThickness = "2px"
                 span.style.textUnderlineOffset = "3px"
-                span.style.textShadow = "0 0 6px rgba(52, 211, 153, 0.35)"
+                span.style.textShadow = "0 0 6px rgba(20, 142, 255, 0.35)"
                 span.style.borderRadius = "4px"
                 span.style.padding = "0 2px"
-                span.style.boxShadow = "0 0 0 1px rgba(16, 185, 129, 0.25) inset"
+                span.style.boxShadow = "0 0 0 1px rgba(20, 142, 255, 0.25) inset"
                 parent.insertBefore(span, textNode)
               }
             }

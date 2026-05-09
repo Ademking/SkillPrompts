@@ -248,9 +248,9 @@ function OptionsIndex() {
         "--input-bg": "rgba(255,255,255,0.03)",
         "--scroll-track": "rgba(255,255,255,0.04)",
         "--scroll-thumb": "rgba(255,255,255,0.16)",
-        "--accent": "#22c55e",
-        "--accent-bg": "rgba(34,197,94,0.12)",
-        "--accent-border": "rgba(34,197,94,0.25)",
+        "--accent": "#148EFF",
+        "--accent-bg": "rgba(20,142,255,0.12)",
+        "--accent-border": "rgba(20,142,255,0.25)",
     } : {
         "--bg": "#f7f8f7",
         "--card": "#ffffff",
@@ -265,9 +265,9 @@ function OptionsIndex() {
         "--input-bg": "#ffffff",
         "--scroll-track": "rgba(15,17,23,0.06)",
         "--scroll-thumb": "rgba(15,17,23,0.18)",
-        "--accent": "#16a34a",
-        "--accent-bg": "rgba(22,163,74,0.1)",
-        "--accent-border": "rgba(22,163,74,0.25)",
+        "--accent": "#148EFF",
+        "--accent-bg": "rgba(20,142,255,0.1)",
+        "--accent-border": "rgba(20,142,255,0.25)",
     }
 
     const inputCls = `plasmo-w-full plasmo-px-3 plasmo-py-2 plasmo-rounded-lg plasmo-border plasmo-border-[var(--border)] plasmo-bg-[var(--input-bg)] plasmo-text-[13px] plasmo-text-[var(--text)] plasmo-outline-none plasmo-transition-all plasmo-duration-150 focus:plasmo-border-[var(--accent)] focus:plasmo-ring-2 focus:plasmo-ring-[var(--accent-bg)] placeholder:plasmo-text-[var(--dim)]`
