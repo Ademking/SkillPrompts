@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from "react"
 import { Storage } from "@plasmohq/storage"
 import "./style.css";
+import Logo from "~components/Logo";
 
 interface Prompt {
     id: string
@@ -46,7 +47,7 @@ function PromptCard({
             {/* Card header */}
             <div className="plasmo-flex plasmo-items-start plasmo-justify-between plasmo-gap-3 plasmo-px-4 plasmo-pt-4 plasmo-pb-3">
                 <div className="plasmo-min-w-0 plasmo-flex-1">
-                    <p className="plasmo-text-[13.5px] plasmo-font-semibold plasmo-font-mono plasmo-text-[var(--text)] plasmo-truncate plasmo-tracking-tight">/{prompt.label}</p>
+                    <p className="plasmo-text-[16px] plasmo-font-semibold plasmo-font-mono plasmo-text-[var(--text)] plasmo-truncate plasmo-tracking-tight">/{prompt.label}</p>
                     {prompt.description && (
                         <p className="plasmo-mt-0.5 plasmo-text-[11.5px] plasmo-text-[var(--muted)] plasmo-truncate">{prompt.description}</p>
                     )}
@@ -281,6 +282,10 @@ function OptionsIndex() {
                 * {
                     scrollbar-width: thin;
                     scrollbar-color: var(--scroll-thumb) var(--scroll-track);
+                    font-family: ui-monospace, "Roboto Mono", "Source Code Pro", source-code-pro,
+    "SF Mono", "IBM Plex Mono", Inconsolata, Menlo, Consolas, "Droid Sans Mono",
+    "DMCA Sans Serif", "Hack", "DejaVu Sans Mono", "Bitstream Vera Sans Mono",
+    monospace;
                 }
 
                 *::-webkit-scrollbar {
@@ -306,19 +311,29 @@ function OptionsIndex() {
 
                 {/* ── Header ── */}
                 <header className="plasmo-flex plasmo-items-center plasmo-justify-between plasmo-gap-4">
-                    <div>
-                        <div className="plasmo-flex plasmo-items-center plasmo-gap-2.5">
-                            {/* Logo mark */}
-                            <div className="plasmo-w-7 plasmo-h-7 plasmo-rounded-lg plasmo-bg-[var(--accent)] plasmo-flex plasmo-items-center plasmo-justify-center">
-                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" /></svg>
-                            </div>
-                            <span className="plasmo-text-[15px] plasmo-font-bold plasmo-tracking-tight plasmo-text-[var(--text)]">SkillPrompts</span>
-                            <span className="plasmo-text-[11px] plasmo-font-medium plasmo-rounded-full plasmo-border plasmo-border-[var(--border)] plasmo-bg-[var(--hover)] plasmo-px-2 plasmo-py-0.5 plasmo-text-[var(--muted)]">
-                                {filteredPrompts.length} prompt{filteredPrompts.length !== 1 ? "s" : ""}
+
+                    <div className="plasmo-flex plasmo-items-center plasmo-gap-3">
+                        {/* Left: Logo */}
+                        <Logo width={40} height={40} color={
+                            isDark ? "var(--accent)" : "#148EFF"
+                        } />
+
+                        {/* Right: Title + Version */}
+                        <div className="plasmo-flex plasmo-flex-col plasmo-items-start plasmo-leading-tight">
+                            <span className="plasmo-text-[22px] plasmo-font-semibold plasmo-tracking-tight" style={{
+                                color: isDark ? "#FFFFFF" : "#0F1117"
+                            }}>
+                                SkillPrompts
+                            </span>
+
+                            <span className="plasmo-text-[11px] plasmo-text-[var(--accent)] plasmo-opacity-70" style={{
+                                color: isDark ? "#ffffff" : "#148EFF"
+                            }}>
+                                v1.0
                             </span>
                         </div>
-                        <p className="plasmo-text-[12px] plasmo-text-[var(--muted)] plasmo-mt-1 plasmo-pl-[37px]">Manage your skill prompts</p>
                     </div>
+
 
                     <div className="plasmo-flex plasmo-items-center plasmo-gap-2">
                         <button
@@ -369,7 +384,7 @@ function OptionsIndex() {
                         {/* Form body */}
                         <div className="plasmo-p-4 plasmo-flex plasmo-flex-col plasmo-gap-4">
                             <div className="plasmo-grid plasmo-grid-cols-2 plasmo-gap-3">
-                                <Field label="Command" error={formErrors.label || formErrors.labelInvalid || formErrors.labelDuplicate} errorMessage={formErrors.label ? "Required" : formErrors.labelDuplicate ? "Command already exists" : "Only a-z, 0-9, - and _"}>
+                                <Field label="Command" error={formErrors.label || formErrors.labelInvalid || formErrors.labelDuplicate} errorMessage={formErrors.label ? "Required" : formErrors.labelDuplicate ? "Command already exists, please choose a different one." : "Only a-z, 0-9, - and _"}>
                                     <input
                                         ref={labelRef}
                                         className={`${inputCls} ${formErrors.label || formErrors.labelInvalid || formErrors.labelDuplicate ? "plasmo-border-red-500 plasmo-ring-2 plasmo-ring-red-500/10" : ""}`}
@@ -416,6 +431,7 @@ function OptionsIndex() {
                                     placeholder="Write your prompt template."
                                     value={formData.template}
                                     onChange={e => { setFormData({ ...formData, template: e.target.value }); setFormErrors(x => ({ ...x, template: false })) }}
+                                    rows={10}
                                 />
                             </Field>
                         </div>

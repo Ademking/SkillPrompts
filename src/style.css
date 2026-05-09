@@ -5,6 +5,8 @@
 #plasmo-shadow-container {
   all: initial;
   box-sizing: border-box;
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica,
-    Arial, sans-serif;
+  font-family: ui-monospace, "Roboto Mono", "Source Code Pro", source-code-pro,
+    "SF Mono", "IBM Plex Mono", Inconsolata, Menlo, Consolas, "Droid Sans Mono",
+    "DMCA Sans Serif", "Hack", "DejaVu Sans Mono", "Bitstream Vera Sans Mono",
+    monospace;
 }

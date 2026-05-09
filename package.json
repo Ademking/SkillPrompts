@@ -1,7 +1,7 @@
 {
   "name": "skillprompts",
-  "displayName": "Skill Prompts Extension",
-  "version": "0.0.1",
+  "displayName": "SkillPrompts",
+  "version": "1.0.0",
   "description": "A Chrome extension to manage and use skill prompts for ChatGPT.",
   "author": "Adem Kouki <ademkingnew@gmail.com>",
   "scripts": {
