@@ -31,6 +31,7 @@ const Icons = {
     grid: () => <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="3" width="7" height="7" /><rect x="14" y="3" width="7" height="7" /><rect x="3" y="14" width="7" height="7" /><rect x="14" y="14" width="7" height="7" /></svg>,
     list: () => <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round"><line x1="8" y1="6" x2="21" y2="6" /><line x1="8" y1="12" x2="21" y2="12" /><line x1="8" y1="18" x2="21" y2="18" /><line x1="3" y1="6" x2="3.01" y2="6" /><line x1="3" y1="12" x2="3.01" y2="12" /><line x1="3" y1="18" x2="3.01" y2="18" /></svg>,
     eye: () => <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" /><circle cx="12" cy="12" r="3" /></svg>,
+    folder: () => <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z" /></svg>,
 }
 
 /* ── Toast ── */
@@ -83,7 +84,7 @@ function ViewPromptModal({ prompt, onClose }: { prompt: Prompt | null; onClose: 
                             </div>
                         )}
                         <div>
-                            <label className="plasmo-text-[11px] plasmo-font-medium plasmo-text-[var(--muted)] plasmo-uppercase plasmo-tracking-widest plasmo-block plasmo-mb-1.5">Template</label>
+                            <label className="plasmo-text-[11px] plasmo-font-medium plasmo-text-[var(--muted)] plasmo-uppercase plasmo-tracking-widest plasmo-block plasmo-mb-1.5">Prompt</label>
                             <pre className="plasmo-px-4 plasmo-py-3 plasmo-bg-[var(--code-bg)] plasmo-font-mono plasmo-text-[12px] plasmo-leading-relaxed plasmo-text-[var(--text)] plasmo-border plasmo-border-[var(--border)] plasmo-overflow-auto plasmo-max-h-[400px] plasmo-whitespace-pre-wrap plasmo-break-words plasmo-scrollbar-thin" style={{ whiteSpace: "pre-wrap", wordBreak: "break-word" }}>{prompt.template}</pre>
                         </div>
                     </div>
@@ -685,9 +686,17 @@ function OptionsIndex() {
                     <div className="plasmo-flex plasmo-items-center plasmo-gap-2">
                         <button
                             onClick={() => openForm()}
-                            className="plasmo-inline-flex plasmo-items-center plasmo-gap-2 plasmo-h-9 plasmo-px-4  plasmo-bg-[var(--accent)] plasmo-text-white plasmo-text-[13px] plasmo-font-semibold plasmo-transition-all hover:plasmo-opacity-90 active:plasmo-scale-[0.97]"
+                            className="plasmo-inline-flex plasmo-items-center plasmo-gap-2 plasmo-h-9 plasmo-px-4  plasmo-bg-[var(--accent)] plasmo-text-white plasmo-text-[13px] plasmo-font-light plasmo-transition-all hover:plasmo-opacity-90 active:plasmo-scale-[0.97]"
                         >
                             <Icons.plus /> Add Command
+                        </button>
+                        <button
+                            onClick={() => {
+                                // TODO: Open prompts library modal
+                            }}
+                            className="plasmo-inline-flex plasmo-items-center plasmo-gap-2 plasmo-h-9 plasmo-px-4 plasmo-border plasmo-border-[var(--border)] plasmo-text-white plasmo-text-[13px] plasmo-font-light plasmo-transition-all hover:plasmo-opacity-90 active:plasmo-scale-[0.97]"
+                        >
+                            <Icons.folder /> Library
                         </button>
                         <ViewToggle viewMode={viewMode} onToggle={toggleView} />
                         <button
