@@ -63,7 +63,7 @@ function ViewPromptModal({ prompt, onClose }: { prompt: Prompt | null; onClose: 
                 onClick={e => e.stopPropagation()}
             >
                 <div className="plasmo-border plasmo-border-[var(--border-hover)] plasmo-bg-[var(--card)] plasmo-shadow-[0_24px_64px_var(--shadow)] plasmo-overflow-hidden">
-                    <div className="plasmo-flex plasmo-items-center plasmo-justify-between plasmo-px-5 plasmo-py-4 plasmo-border-b plasmo-border-[var(--border)]">
+                    <div className="plasmo-flex plasmo-items-center plasmo-justify-between plasmo-px-5 plasmo-py-2 plasmo-border-b plasmo-border-[var(--border)]">
                         <div className="plasmo-flex plasmo-items-center plasmo-gap-2.5">
                             <div className="plasmo-w-2 plasmo-h-2 plasmo-bg-[var(--accent)]" />
                             <span className="plasmo-text-[14px] plasmo-font-semibold plasmo-text-[var(--text)]">
@@ -90,7 +90,7 @@ function ViewPromptModal({ prompt, onClose }: { prompt: Prompt | null; onClose: 
                             <pre className="plasmo-px-4 plasmo-py-3 plasmo-bg-[var(--code-bg)] plasmo-font-mono plasmo-text-[12px] plasmo-leading-relaxed plasmo-text-[var(--text)] plasmo-border plasmo-border-[var(--border)] plasmo-overflow-auto plasmo-max-h-[400px] plasmo-whitespace-pre-wrap plasmo-break-words plasmo-scrollbar-thin" style={{ whiteSpace: "pre-wrap", wordBreak: "break-word" }}>{prompt.template}</pre>
                         </div>
                     </div>
-                    <div className="plasmo-flex plasmo-items-center plasmo-justify-end plasmo-px-5 plasmo-py-4 plasmo-border-t plasmo-border-[var(--border)] plasmo-bg-[var(--hover)]">
+                    <div className="plasmo-flex plasmo-items-center plasmo-justify-end plasmo-px-5 plasmo-py-2 plasmo-border-t plasmo-border-[var(--border)] plasmo-bg-[var(--hover)]">
                         <button onClick={onClose} className="plasmo-h-9 plasmo-px-4 plasmo-border plasmo-border-[var(--border)] plasmo-text-[12px] plasmo-font-medium plasmo-text-[var(--muted)] plasmo-transition-colors hover:plasmo-bg-[var(--hover)] hover:plasmo-text-[var(--text)]">
                             Close
                         </button>
@@ -134,7 +134,7 @@ function LibraryModal({ onImport, onClose, existingLabels }: { onImport: (p: Lib
                 onKeyDown={e => { if (e.key === "Escape") onClose() }}
             >
                 <div className="plasmo-border plasmo-border-[var(--border-hover)] plasmo-bg-[var(--card)] plasmo-shadow-[0_24px_64px_var(--shadow)] plasmo-overflow-hidden plasmo-flex plasmo-flex-col plasmo-max-h-full">
-                    <div className="plasmo-flex plasmo-items-center plasmo-justify-between plasmo-px-5 plasmo-py-4 plasmo-border-b plasmo-border-[var(--border)]">
+                    <div className="plasmo-flex plasmo-items-center plasmo-justify-between plasmo-px-5 plasmo-py-2 plasmo-border-b plasmo-border-[var(--border)]">
                         <div className="plasmo-flex plasmo-items-center plasmo-gap-2.5">
                             <div className="plasmo-w-2 plasmo-h-2 plasmo-bg-[var(--accent)]" />
                             <span className="plasmo-text-[14px] plasmo-font-semibold plasmo-text-[var(--text)]">Prompt Library</span>
@@ -295,38 +295,37 @@ function PromptRow({
 }) {
     const isCopied = copiedId === prompt.id
     return (
-        <div className="plasmo-group plasmo-flex plasmo-items-center plasmo-gap-4 plasmo-px-5 plasmo-py-3.5  plasmo-border plasmo-border-[var(--border)] plasmo-bg-[var(--card)] plasmo-transition-all plasmo-duration-200 hover:plasmo-border-[var(--border-hover)] hover:plasmo-bg-[var(--hover)]">
-            <div className="plasmo-flex plasmo-items-center plasmo-gap-3 plasmo-min-w-0 plasmo-flex-[2]">
-
-                <div className="plasmo-min-w-0">
-                    <span className="plasmo-text-[14px] plasmo-font-semibold plasmo-text-[var(--accent)] plasmo-bg-[var(--accent-bg)] plasmo-px-1.5 plasmo-py-0.5 plasmo-shrink-0">/{prompt.label}</span>
+        <div className="plasmo-flex plasmo-items-stretch plasmo-min-h-0 plasmo-transition-colors plasmo-duration-150 hover:plasmo-bg-[var(--hover)]">
+            <div className="plasmo-flex plasmo-items-center plasmo-gap-4 plasmo-px-5 plasmo-py-3.5 plasmo-flex-1 plasmo-min-w-0">
+                <div className="plasmo-min-w-0 plasmo-flex-[2]">
+                    <span className="plasmo-text-[14px] plasmo-font-semibold plasmo-text-[var(--accent)] plasmo-bg-[var(--accent-bg)] plasmo-px-1.5 plasmo-py-0.5">/{prompt.label}</span>
                     {prompt.description && (
-                        <p className="plasmo-text-[11.5px] plasmo-text-[var(--muted)] plasmo-truncate">{prompt.description}</p>
+                        <p className="plasmo-text-[12px] plasmo-text-[var(--muted)] plasmo-mt-0.5 plasmo-truncate">{prompt.description}</p>
                     )}
                 </div>
+
+                <pre className="plasmo-flex-[3] plasmo-min-w-0 plasmo-px-3.5 plasmo-py-2 plasmo-bg-[var(--code-bg)] plasmo-font-mono plasmo-text-[12px] plasmo-leading-relaxed plasmo-text-[var(--muted)] plasmo-overflow-hidden plasmo-truncate">
+                    {prompt.template}
+                </pre>
             </div>
 
-            <pre className="plasmo-flex-[3] plasmo-min-w-0 plasmo-px-3 plasmo-py-2  plasmo-bg-[var(--code-bg)] plasmo-font-mono plasmo-text-[11px] plasmo-leading-relaxed plasmo-text-[var(--muted)] plasmo-overflow-hidden plasmo-truncate plasmo-border plasmo-border-[var(--border)]">
-                {prompt.template}
-            </pre>
-
-            <div className="plasmo-flex plasmo-items-center plasmo-gap-1 plasmo-shrink-0">
+            <div className="plasmo-flex plasmo-items-center plasmo-gap-0.5 plasmo-px-2 plasmo-border-l plasmo-border-[var(--border)]">
                 <button
                     onClick={() => onCopy(prompt)}
-                    className={`plasmo-flex plasmo-h-8 plasmo-px-3 plasmo-items-center plasmo-justify-center plasmo-gap-1.5  plasmo-text-[11px] plasmo-font-medium plasmo-transition-all plasmo-duration-200 ${isCopied
+                    className={`plasmo-flex plasmo-h-8 plasmo-px-3 plasmo-items-center plasmo-justify-center plasmo-gap-1.5 plasmo-text-[11px] plasmo-font-medium plasmo-transition-all plasmo-duration-200 ${isCopied
                         ? "plasmo-bg-emerald-500/10 plasmo-text-emerald-500"
                         : "plasmo-text-[var(--muted)] hover:plasmo-bg-[var(--hover)] hover:plasmo-text-[var(--text)]"
                         }`}
                 >
                     {isCopied ? <><Icons.check /> Copied</> : <><Icons.copy /> Copy</>}
                 </button>
-                <button onClick={() => onView(prompt)} className="plasmo-flex plasmo-h-7 plasmo-w-7 plasmo-items-center plasmo-justify-center  plasmo-text-[var(--muted)] plasmo-transition-colors hover:plasmo-bg-[var(--hover)] hover:plasmo-text-[var(--text)]" aria-label="View">
+                <button onClick={() => onView(prompt)} className="plasmo-flex plasmo-h-8 plasmo-w-8 plasmo-items-center plasmo-justify-center plasmo-text-[var(--muted)] plasmo-transition-colors hover:plasmo-bg-[var(--hover)] hover:plasmo-text-[var(--text)]" aria-label="View">
                     <Icons.eye />
                 </button>
-                <button onClick={() => onEdit(prompt)} className="plasmo-flex plasmo-h-7 plasmo-w-7 plasmo-items-center plasmo-justify-center  plasmo-text-[var(--muted)] plasmo-transition-colors hover:plasmo-bg-[var(--hover)] hover:plasmo-text-[var(--text)]" aria-label="Edit">
+                <button onClick={() => onEdit(prompt)} className="plasmo-flex plasmo-h-8 plasmo-w-8 plasmo-items-center plasmo-justify-center plasmo-text-[var(--muted)] plasmo-transition-colors hover:plasmo-bg-[var(--hover)] hover:plasmo-text-[var(--text)]" aria-label="Edit">
                     <Icons.edit />
                 </button>
-                <button onClick={() => { if (window.confirm(`Delete "${prompt.label}"?`)) onDelete(prompt.id) }} className="plasmo-flex plasmo-h-7 plasmo-w-7 plasmo-items-center plasmo-justify-center  plasmo-text-[var(--muted)] plasmo-transition-colors hover:plasmo-bg-red-500/10 hover:plasmo-text-red-500" aria-label="Delete">
+                <button onClick={() => { if (window.confirm(`Delete "${prompt.label}"?`)) onDelete(prompt.id) }} className="plasmo-flex plasmo-h-8 plasmo-w-8 plasmo-items-center plasmo-justify-center plasmo-text-[var(--muted)] plasmo-transition-colors hover:plasmo-bg-red-500/10 hover:plasmo-text-red-500" aria-label="Delete">
                     <Icons.trash />
                 </button>
             </div>
@@ -698,9 +697,9 @@ function OptionsIndex() {
                     >
                         <div className=" plasmo-border plasmo-border-[var(--border-hover)] plasmo-bg-[var(--card)] plasmo-shadow-[0_24px_64px_var(--shadow)] plasmo-overflow-hidden">
                             {/* Form header */}
-                            <div className="plasmo-flex plasmo-items-center plasmo-justify-between plasmo-px-5 plasmo-py-4 plasmo-border-b plasmo-border-[var(--border)]">
+                            <div className="plasmo-flex plasmo-items-center plasmo-justify-between plasmo-px-5 plasmo-py-2 plasmo-border-b plasmo-border-[var(--border)]">
                                 <div className="plasmo-flex plasmo-items-center plasmo-gap-2.5">
-                                    <div className="plasmo-w-2 plasmo-h-2  plasmo-bg-[var(--accent)]" />
+                                    <div className="plasmo-w-2 plasmo-h-2 plasmo-bg-[var(--accent)]" />
                                     <span className="plasmo-text-[14px] plasmo-font-semibold plasmo-text-[var(--text)]">
                                         {editingId ? "Edit prompt" : "New prompt"}
                                     </span>
@@ -769,7 +768,7 @@ function OptionsIndex() {
                             </div>
 
                             {/* Form footer */}
-                            <div className="plasmo-flex plasmo-items-center plasmo-justify-between plasmo-px-5 plasmo-py-4 plasmo-border-t plasmo-border-[var(--border)] plasmo-bg-[var(--hover)]">
+                            <div className="plasmo-flex plasmo-items-center plasmo-justify-between plasmo-px-5 plasmo-py-2 plasmo-border-t plasmo-border-[var(--border)] plasmo-bg-[var(--hover)]">
                                 <span className="plasmo-text-[11px] plasmo-text-[var(--dim)]"></span>
                                 <div className="plasmo-flex plasmo-gap-2">
                                     <button onClick={closeForm} className="plasmo-h-9 plasmo-px-4  plasmo-border plasmo-border-[var(--border)] plasmo-text-[12px] plasmo-font-medium plasmo-text-[var(--muted)] plasmo-transition-colors hover:plasmo-bg-[var(--hover)] hover:plasmo-text-[var(--text)]">
@@ -877,7 +876,7 @@ function OptionsIndex() {
                         ))}
                     </div>
                 ) : (
-                    <div className="plasmo-flex plasmo-flex-col plasmo-gap-3">
+                    <div className="plasmo-flex plasmo-flex-col plasmo-border plasmo-border-[var(--border)] divide-y divide-[var(--border)]">
                         {filteredPrompts.map(p => (
                             <PromptRow
                                 key={p.id}
