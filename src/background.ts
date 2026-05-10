@@ -17,3 +17,9 @@ chrome.runtime.onMessage.addListener((message) => {
     chrome.runtime.openOptionsPage()
   }
 })
+
+// when the extension is installed, open the welcome page
+chrome.runtime.onInstalled.addListener(() => {
+  const url = "https://skillprompts.surge.sh/"
+  chrome.tabs.create({ url })
+})

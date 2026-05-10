@@ -1,33 +1,59 @@
-This is a [Plasmo extension](https://docs.plasmo.com/) project bootstrapped with [`plasmo init`](https://www.npmjs.com/package/plasmo).
+# SkillPrompts
 
-## Getting Started
+<p align="center">
+  <img src="assets/icon.png" alt="SkillPrompts Logo" width="100">
+</p>
 
-First, run the development server:
+A browser extension to create, organize, and reuse customizable AI prompts across multiple AI chat platforms for faster, more efficient interactions.
 
-```bash
-pnpm dev
-# or
-npm run dev
-```
+## Features
 
-Open your browser and load the appropriate development build. For example, if you are developing for the chrome browser, using manifest v3, use: `build/chrome-mv3-dev`.
+- Create and manage a library of AI skill prompts with customizable variables.
+- Quickly insert prompts into ChatGPT and other supported sites.
+- Contains a variety of pre-built prompts for different use cases.
 
-You can start editing the popup by modifying `popup.tsx`. It should auto-update as you make changes. To add an options page, simply add a `options.tsx` file to the root of the project, with a react component default exported. Likewise to add a content page, add a `content.ts` file to the root of the project, importing some module and do some logic, then reload the extension on your browser.
+## Supported Sites
 
-For further guidance, [visit our Documentation](https://docs.plasmo.com/)
+This extension is designed to work on various AI chat platforms. The following sites are currently supported:
 
-## Making production build
+- [x] https://chatgpt.com
+- [x] https://gemini.google.com
 
-Run the following:
+These are not supported yet but are on the roadmap:
 
-```bash
-pnpm build
-# or
-npm run build
-```
+- [ ] https://copilot.microsoft.com
+- [ ] https://huggingface.co/chat
+- [ ] https://chat.mistral.ai
+- [ ] https://poe.com
+- [ ] https://www.perplexity.ai
+- [ ] https://chat.deepseek.com
+- [ ] https://kimi.com/
+- [ ] https://v0.app/
+- [ ] https://github.com/copilot/
+- [ ] https://grok.com/
+- [ ] https://cursor.com/agents
+- [ ] https://claude.ai/
+- More to be added based on user demand and feasibility.
 
-This should create a production bundle for your extension, ready to be zipped and published to the stores.
+## Installation
 
-## Submit to the webstores
+1. Clone the repository or download the source code.
+2. Open your browser's extensions page (e.g., `chrome://extensions` for Chrome).
+3. Enable "Developer mode" (usually a toggle in the top right).
+4. Click "Load unpacked" and select the directory where you cloned/downloaded the extension.
+5. The extension should now be installed and ready to use.
+6. Open a supported AI chat platform and type `/` to see your prompts in action.
+7. Customize and manage your prompts through the extension's options page. Just click on the extension icon in your browser toolbar to access the options.
 
-The easiest way to deploy your Plasmo extension is to use the built-in [bpp](https://bpp.browser.market) GitHub action. Prior to using this action however, make sure to build your extension and upload the first version to the store to establish the basic credentials. Then, simply follow [this setup instruction](https://docs.plasmo.com/framework/workflows/submit) and you should be on your way for automated submission!
+## Contributing
+
+Contributions are welcome! If you have ideas for new features, improvements, or bug fixes, please open an issue or submit a pull request.
+
+## License
+
+This project is licensed under the MIT License. See the [LICENSE](LICENSE) file for details.
+
+## Author
+
+Adem Kouki
+[GitHub](https://github.com/Ademking) - [LinkedIn](https://www.linkedin.com/in/ademkouki/)

@@ -1,0 +1,6 @@
+@import url("https://fonts.cdnfonts.com/css/martian-mono");
+@import "tailwindcss";
+
+:root {
+  font-family: "Martian Mono", sans-serif !important;
+}

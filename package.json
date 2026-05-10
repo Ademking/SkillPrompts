@@ -2,7 +2,7 @@
   "name": "skillprompts",
   "displayName": "SkillPrompts",
   "version": "1.0.0",
-  "description": "A Chrome extension to manage and use skill prompts for ChatGPT.",
+  "description": "A browser extension to create, organize, and reuse customizable AI prompts across multiple AI chat platforms for faster, more efficient interactions.",
   "author": "Adem Kouki <ademkingnew@gmail.com>",
   "scripts": {
     "dev": "plasmo dev",
@@ -30,22 +30,10 @@
     "host_permissions": [
       "https://chatgpt.com/*",
       "https://chat.openai.com/*",
-      "https://claude.ai/*",
-      "https://gemini.google.com/*",
-      "https://copilot.microsoft.com/*",
-      "https://huggingface.co/chat/*",
-      "https://chat.mistral.ai/*",
-      "https://poe.com/*",
-      "https://www.perplexity.ai/*",
-      "https://chat.deepseek.com/*",
-      "https://kimi.com/*",
-      "https://*.kimi.com/*",
-      "https://m365.cloud.microsoft/*",
-      "https://v0.app/*",
-      "https://github.com/copilot/*",
-      "https://grok.com/*",
-      "https://cursor.com/agents*",
-      "https://cursor.com/*/agents*"
-    ]
+      "https://gemini.google.com/*"
+    ],
+    "content_security_policy": {
+      "extension_pages": "script-src 'self'; object-src 'self'; frame-src https://www.youtube.com https://www.youtube-nocookie.com"
+    }
   }
 }

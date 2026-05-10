@@ -12,22 +12,7 @@ export const config: PlasmoCSConfig = {
   matches: [
     "https://chatgpt.com/*",
     "https://chat.openai.com/*",
-    "https://claude.ai/*",
-    "https://gemini.google.com/*",
-    "https://copilot.microsoft.com/*",
-    "https://huggingface.co/chat/*",
-    "https://chat.mistral.ai/*",
-    "https://poe.com/*",
-    "https://www.perplexity.ai/*",
-    "https://chat.deepseek.com/*",
-    "https://kimi.com/*",
-    "https://*.kimi.com/*",
-    "https://m365.cloud.microsoft/*",
-    "https://v0.app/*",
-    "https://github.com/copilot/*",
-    "https://grok.com/*",
-    "https://cursor.com/agents*",
-    "https://cursor.com/*/agents*"
+    "https://gemini.google.com/*"
   ]
 }
 
@@ -74,7 +59,7 @@ const CommandPaletteUI = () => {
   const selectionRangeRef = useRef<{ start: number; end: number } | null>(null)
   const contentEditableRangeRef = useRef<Range | null>(null)
   const paletteRef = useRef<HTMLDivElement>(null)
-  const hiddenMenuRef = useRef<HTMLElement | null>(null)
+  const hiddenMenusRef = useRef<HTMLElement[]>([])
   const hideMenuTimeoutRef = useRef<number | null>(null)
   const highlightedRangesRef = useRef<Range[]>([])
   const ignoreMutationsRef = useRef(false)
@@ -514,40 +499,9 @@ const CommandPaletteUI = () => {
     }
   }
 
-  const hideDefaultMenu = () => {
-    let attempts = 0
 
-    const tryHide = () => {
-      const popoverContainer = Array.from(document.querySelectorAll("div.popover")).find((element) =>
-        Boolean(element.querySelector('.__menu-item[tabindex="0"]'))
-      ) as HTMLElement | undefined
 
-      if (popoverContainer) {
-        hiddenMenuRef.current = popoverContainer
-        popoverContainer.style.display = "none"
-        return
-      }
 
-      if (attempts < 10) {
-        attempts += 1
-        hideMenuTimeoutRef.current = window.setTimeout(tryHide, 0)
-      }
-    }
-
-    tryHide()
-  }
-
-  const showDefaultMenu = () => {
-    if (hideMenuTimeoutRef.current !== null) {
-      window.clearTimeout(hideMenuTimeoutRef.current)
-      hideMenuTimeoutRef.current = null
-    }
-
-    if (hiddenMenuRef.current) {
-      hiddenMenuRef.current.style.display = ""
-      hiddenMenuRef.current = null
-    }
-  }
 
   useEffect(() => {
     injectHighlightStyles()
@@ -731,14 +685,13 @@ const CommandPaletteUI = () => {
             }
           }
 
-          hideDefaultMenu()
+          //hideDefaultMenu()
           setIsVisible(true)
           setInputValue("")
         }
       }
 
       if (event.key === "Escape" && isVisible) {
-        showDefaultMenu()
         setIsVisible(false)
       }
     }
@@ -781,7 +734,6 @@ const CommandPaletteUI = () => {
         // ignore and fall through to closing
       }
 
-      showDefaultMenu()
       setIsVisible(false)
     }
 
@@ -898,7 +850,6 @@ const CommandPaletteUI = () => {
     targetRef.current = null
     selectionRangeRef.current = null
     contentEditableRangeRef.current = null
-    showDefaultMenu()
     setIsVisible(false)
   }
 
