@@ -31,9 +31,12 @@ const PROMPTS_STORAGE_KEY = "skillprompts_prompts"
 const ENABLED_STORAGE_KEY = "skillprompts_enabled"
 
 function extractVariables(template: string): string[] {
-  const matches = template.match(/\{\{(\w+)\}\}/g)
+  const matches = template.match(/\{\{\s*(\w+)\s*\}\}/g)
   if (!matches) return []
-  return [...new Set(matches.map(m => m.slice(2, -2)))]
+  return [...new Set(matches.map(m => {
+    const trimmed = m.slice(2, -2).trim()
+    return trimmed
+  }))]
 }
 
 type StoredPrompt = {
@@ -327,9 +330,9 @@ const CommandPaletteUI = () => {
       if (templateVars.length > 0) {
         for (const vName of templateVars) {
           const val = vars[vName] || ""
-          result = result.replace(new RegExp(`\\{\\{${vName}\\}\\}`, "g"), val)
+          result = result.replace(new RegExp(`\\{\\{\\s*${vName}\\s*\\}\\}`, "g"), val)
         }
-        result = result.replace(/\{\{\w+\}\}/g, "")
+        result = result.replace(/\{\{\s*\w+\s*\}\}/g, "")
       }
 
       return result
