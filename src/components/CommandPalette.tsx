@@ -9,6 +9,13 @@ interface Command {
     template: string
 }
 
+function extractVarCount(template: string): number {
+  const matches = template.match(/\{\{\s*\w+\s*\}\}/g)
+  if (!matches) return 0
+  const names = matches.map(m => m.replace(/\{\{\s*/, '').replace(/\s*\}\}/, ''))
+  return new Set(names).size
+}
+
 const COMMANDS: Command[] = [
     { id: "summarize", label: "Summarize", description: "Summarize the text", template: "Summarize the following text:" },
     { id: "explain", label: "Explain", description: "Simplify and explain", template: "Explain the following in simple terms:" },
@@ -177,6 +184,14 @@ const CommandPalette: FC<Props> = ({
                                     <div className="plasmo-min-w-0 plasmo-flex-1">
                                         <div className="plasmo-flex plasmo-items-center plasmo-gap-1.5">
                                             <span className="plasmo-text-xs plasmo-font-semibold plasmo-font-mono">/{cmd.label}</span>
+                                            {(() => {
+                                                const vc = extractVarCount(cmd.template)
+                                                if (vc === 0) return null
+                                                return (
+                                                    <span className={`plasmo-px-1.5 plasmo-py-0 plasmo-text-[10px] plasmo-font-medium ${D ? "plasmo-bg-white/5 plasmo-text-neutral-400" : "plasmo-bg-neutral-200 plasmo-text-neutral-500"
+                                                        }`}>{vc} var{vc > 1 ? "s" : ""}</span>
+                                                )
+                                            })()}
                                             {/* <span className={`plasmo-px-1.5 plasmo-py-0 plasmo-text-[9px] plasmo-font-medium plasmo-uppercase plasmo-tracking-wide ${
                                                 D ? "plasmo-bg-white/5 plasmo-text-neutral-400" : "plasmo-bg-neutral-200 plasmo-text-neutral-500"
                                             }`}>/{cmd.id}</span> */}
