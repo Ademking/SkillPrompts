@@ -28,7 +28,11 @@ export function PromptCard({
                     </div>
 
                     <p className="plasmo-mt-0.5 plasmo-text-[11px] plasmo-text-[var(--muted)] plasmo-line-clamp-1">
-
+                        {vc > 0 && (
+                            <span className="plasmo-text-[10px] plasmo-font-medium plasmo-text-[var(--dim)] plasmo-mr-2">
+                                {vc} var{vc > 1 ? "s" : ""}
+                            </span>
+                        )}
                         {prompt.description || ""}
                     </p>
                 </div>
@@ -86,7 +90,14 @@ export function PromptCard({
                         wordBreak: "break-word",
                     }}
                 >
-                    {prompt.template}
+                    {prompt.template.split(/(\{\{\s*\w+\s*\}\})/g).map((seg, i) => {
+                        const m = seg.match(/^\{\{\s*(\w+)\s*\}\}$/)
+                        if (m) {
+                            const name = m[1].toUpperCase()
+                            return <span key={i} className="plasmo-inline-flex plasmo-items-center plasmo-px-1.5 plasmo-py-0 plasmo-text-[10px] plasmo-font-semibold plasmo-leading-tight plasmo-bg-amber-500/15 plasmo-text-amber-400 plasmo-border plasmo-border-amber-500/20">{name}</span>
+                        }
+                        return seg
+                    })}
                 </pre>
 
             </div>

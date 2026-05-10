@@ -31,7 +31,14 @@ export function PromptRow({
                 </div>
 
                 <pre className="plasmo-flex-[3] plasmo-min-w-0 plasmo-px-3.5 plasmo-py-2 plasmo-bg-[var(--code-bg)] plasmo-font-mono plasmo-text-[12px] plasmo-leading-relaxed plasmo-text-[var(--muted)] plasmo-overflow-hidden plasmo-truncate">
-                    {prompt.template}
+                    {prompt.template.split(/(\{\{\s*\w+\s*\}\})/g).map((seg, i) => {
+                        const m = seg.match(/^\{\{\s*(\w+)\s*\}\}$/)
+                        if (m) {
+                            const name = m[1].toUpperCase()
+                            return <span key={i} className="plasmo-inline-flex plasmo-items-center plasmo-px-1.5 plasmo-py-0 plasmo-text-[10px] plasmo-font-semibold plasmo-leading-tight plasmo-bg-amber-500/15 plasmo-text-amber-400 plasmo-border plasmo-border-amber-500/20">{name}</span>
+                        }
+                        return seg
+                    })}
                 </pre>
             </div>
 

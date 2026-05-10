@@ -24,6 +24,47 @@ export function FormModal({
     const [formErrors, setFormErrors] = useState({ label: false, labelInvalid: false, labelDuplicate: false, template: false })
     const labelRef = useRef<HTMLInputElement>(null)
     const modalRef = useRef<HTMLDivElement>(null)
+    const templateRef = useRef<HTMLDivElement>(null)
+    const highlightInitRef = useRef(false)
+
+    useEffect(() => {
+        if (!templateRef.current || highlightInitRef.current) return
+        templateRef.current.textContent = formData.template
+        highlightInitRef.current = true
+    }, [formData.template])
+
+    useEffect(() => {
+        if (!templateRef.current) return
+        const el = templateRef.current
+        const text = el.textContent || ""
+        const regex = /\{\{\s*\w+\s*\}\}/g
+        const ranges: Range[] = []
+        const walker = document.createTreeWalker(el, NodeFilter.SHOW_TEXT, null)
+        const textNodes: Text[] = []
+        let node
+        while ((node = walker.nextNode())) textNodes.push(node as Text)
+
+        for (const tn of textNodes) {
+            const content = tn.nodeValue || ""
+            let match
+            while ((match = regex.exec(content)) !== null) {
+                const range = document.createRange()
+                range.setStart(tn, match.index)
+                range.setEnd(tn, match.index + match[0].length)
+                ranges.push(range)
+            }
+        }
+
+        try {
+            ; (CSS as any).highlights.delete("form-var-highlight")
+            if (ranges.length > 0) {
+                const highlight = new Highlight(...ranges)
+                ; (CSS as any).highlights.set("form-var-highlight", highlight)
+            }
+        } catch (e) {
+            // ignore
+        }
+    }, [formData.template])
 
     useEffect(() => {
         setTimeout(() => labelRef.current?.focus(), 80)
@@ -136,13 +177,40 @@ export function FormModal({
                             </Field>
                         </div>
                         <Field label="Template" error={formErrors.template}>
-                            <textarea
-                                className={`${inputCls} plasmo-font-mono plasmo-text-[12px] plasmo-resize-y plasmo-min-h-[120px] plasmo-leading-relaxed plasmo-py-3 ${formErrors.template ? "plasmo-border-red-500/50 plasmo-ring-2 plasmo-ring-red-500/10" : ""}`}
-                                placeholder="You are an expert at..."
-                                value={formData.template}
-                                onChange={e => { setFormData({ ...formData, template: e.target.value }); setFormErrors(x => ({ ...x, template: false })) }}
-                                rows={8}
-                            />
+                            <style>{`
+                                ::highlight(form-var-highlight) {
+                                    background-color: rgba(245, 158, 11, 0.18);
+                                    color: #F59E0B;
+                                    border-radius: 2px;
+                                }
+                                [contenteditable][data-placeholder]:empty::before {
+                                    content: attr(data-placeholder);
+                                    color: var(--dim);
+                                    pointer-events: none;
+                                }
+                            `}</style>
+                            <div
+                                ref={templateRef}
+                                contentEditable
+                                suppressContentEditableWarning
+                                className={`plasmo-w-full plasmo-px-3.5 plasmo-py-3 plasmo-font-mono plasmo-text-[12px] plasmo-leading-relaxed plasmo-outline-none plasmo-whitespace-pre-wrap plasmo-break-words plasmo-overflow-y-auto plasmo-transition-all plasmo-duration-150 focus:plasmo-border-[var(--accent)] focus:plasmo-ring-2 focus:plasmo-ring-[var(--accent-bg)] plasmo-border ${formErrors.template ? "plasmo-border-red-500/50 plasmo-ring-2 plasmo-ring-red-500/10" : "plasmo-border-[var(--border)]"} plasmo-bg-[var(--input-bg)] plasmo-text-[var(--text)]`}
+                                style={{ caretColor: 'var(--text)', height: '160px', maxHeight: '160px' }}
+                                onInput={() => {
+                                    const val = templateRef.current?.textContent || ""
+                                    setFormData(prev => ({ ...prev, template: val }))
+                                    setFormErrors(x => ({ ...x, template: false }))
+                                }}
+                                onKeyDown={e => {
+                                    if (e.key === "Tab") {
+                                        e.preventDefault()
+                                        document.execCommand("insertText", false, "  ")
+                                    }
+                                }}
+                                data-placeholder="You are an expert at..."
+                            ></div>
+                            <p className="plasmo-mt-1.5 plasmo-text-[11px] plasmo-text-[var(--dim)]">
+                                Tip: Use <span className="plasmo-font-mono plasmo-text-amber-400">&#123;&#123;variable&#125;&#125;</span> to add variables to your prompt
+                            </p>
                         </Field>
                     </div>
 
