@@ -29,6 +29,7 @@ export const getStyle = (): HTMLStyleElement => {
 
 const PROMPTS_STORAGE_KEY = "skillprompts_prompts"
 const ENABLED_STORAGE_KEY = "skillprompts_enabled"
+const USAGE_STORAGE_KEY = "skillprompts_usage"
 
 function extractVariables(template: string): string[] {
   const matches = template.match(/\{\{\s*(\w+)\s*\}\}/g)
@@ -389,6 +390,11 @@ const CommandPaletteUI = () => {
         }
         result = result.replace(/\{\{\s*\w+\s*\}\}/g, "")
       }
+
+      storage.get<Record<string, number>>(USAGE_STORAGE_KEY).then(usage => {
+        const next = { ...(usage || {}), [label]: ((usage || {})[label] || 0) + 1 }
+        storage.set(USAGE_STORAGE_KEY, next)
+      })
 
       return result
     }

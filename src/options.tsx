@@ -17,10 +17,12 @@ const PROMPTS_STORAGE_KEY = "skillprompts_prompts"
 const THEME_STORAGE_KEY = "skillprompts_theme"
 const VIEW_STORAGE_KEY = "skillprompts_view"
 const ENABLED_STORAGE_KEY = "skillprompts_enabled"
+const USAGE_STORAGE_KEY = "skillprompts_usage"
 
 function OptionsIndex() {
     const storage = useMemo(() => new Storage({ area: "local" }), [])
     const [prompts, setPrompts] = useState<Prompt[]>([])
+    const [usage, setUsage] = useState<Record<string, number>>({})
     const [isEnabled, setIsEnabled] = useState(true)
     const [isDark, setIsDark] = useState(true)
     const [hasLoadedStorage, setHasLoadedStorage] = useState(false)
@@ -60,9 +62,11 @@ function OptionsIndex() {
                 const legacyTheme = window.localStorage.getItem(THEME_STORAGE_KEY)
                 const savedView = await storage.get<"grid" | "list">(VIEW_STORAGE_KEY)
                 const savedEnabled = await storage.get<boolean>(ENABLED_STORAGE_KEY)
+                const savedUsage = await storage.get<Record<string, number>>(USAGE_STORAGE_KEY)
 
                 if (!cancelled) {
                     setPrompts(nextPrompts)
+                    setUsage(savedUsage || {})
                     const storedPreference = savedTheme ?? legacyTheme
                     setIsDark(storedPreference ? storedPreference === "dark" : true)
                     if (savedView) setViewMode(savedView)
@@ -86,6 +90,9 @@ function OptionsIndex() {
             },
             [THEME_STORAGE_KEY]: (change: { newValue?: "light" | "dark" }) => {
                 setIsDark(change.newValue !== "light")
+            },
+            [USAGE_STORAGE_KEY]: (change: { newValue?: Record<string, number> }) => {
+                setUsage(change.newValue || {})
             }
         })
 
@@ -422,6 +429,7 @@ function OptionsIndex() {
                                 onDelete={handleDelete}
                                 onView={setViewPrompt}
                                 copiedId={copiedId}
+                                usage={usage[p.label]}
                             />
                         ))}
                     </div>
@@ -437,6 +445,7 @@ function OptionsIndex() {
                                     onDelete={handleDelete}
                                     onView={setViewPrompt}
                                     copiedId={copiedId}
+                                    usage={usage[p.label]}
                                 />
                                 {
                                     // add hr between items except the last one (already have border)

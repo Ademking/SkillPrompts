@@ -9,12 +9,13 @@ function varCount(template: string): number {
 }
 
 export function PromptCard({
-    prompt, onCopy, onEdit, onDelete, onView, copiedId,
+    prompt, onCopy, onEdit, onDelete, onView, copiedId, usage,
 }: {
-    prompt: Prompt; onCopy: (p: Prompt) => void; onEdit: (p: Prompt) => void; onDelete: (id: string) => void; onView: (p: Prompt) => void; copiedId: string | null
+    prompt: Prompt; onCopy: (p: Prompt) => void; onEdit: (p: Prompt) => void; onDelete: (id: string) => void; onView: (p: Prompt) => void; copiedId: string | null; usage?: number
 }) {
     const isCopied = copiedId === prompt.id
     const vc = varCount(prompt.template)
+    const uc = usage || 0
     return (
         <div className="plasmo-group plasmo-relative plasmo-flex plasmo-flex-col  plasmo-border plasmo-border-[var(--border)] plasmo-bg-[var(--card)] plasmo-overflow-hidden plasmo-transition-all plasmo-duration-200 hover:plasmo-border-[var(--border-hover)] hover:plasmo-shadow-[0_8px_32px_var(--shadow)] hover:plasmo--translate-y-0.5">
             <div className="plasmo-flex plasmo-items-start plasmo-justify-between plasmo-gap-2 plasmo-px-4 plasmo-pt-3 plasmo-pb-2">
@@ -31,6 +32,11 @@ export function PromptCard({
                         {vc > 0 && (
                             <span className="plasmo-text-[10px] plasmo-font-medium plasmo-text-[var(--dim)] plasmo-mr-2">
                                 {vc} var{vc > 1 ? "s" : ""}
+                            </span>
+                        )}
+                        {uc > 0 && (
+                            <span className="plasmo-text-[10px] plasmo-text-[var(--dim)] plasmo-mr-2">
+                                {uc} use{uc > 1 ? "s" : ""}
                             </span>
                         )}
                         {prompt.description || ""}

@@ -9,12 +9,13 @@ function varCount(template: string): number {
 }
 
 export function PromptRow({
-    prompt, onCopy, onEdit, onDelete, onView, copiedId,
+    prompt, onCopy, onEdit, onDelete, onView, copiedId, usage,
 }: {
-    prompt: Prompt; onCopy: (p: Prompt) => void; onEdit: (p: Prompt) => void; onDelete: (id: string) => void; onView: (p: Prompt) => void; copiedId: string | null
+    prompt: Prompt; onCopy: (p: Prompt) => void; onEdit: (p: Prompt) => void; onDelete: (id: string) => void; onView: (p: Prompt) => void; copiedId: string | null; usage?: number
 }) {
     const isCopied = copiedId === prompt.id
     const vc = varCount(prompt.template)
+    const uc = usage || 0
     return (
         <div className="plasmo-flex plasmo-items-stretch plasmo-min-h-0 plasmo-transition-colors plasmo-duration-150 hover:plasmo-bg-[var(--hover)]">
             <div className="plasmo-flex plasmo-items-center plasmo-gap-4 plasmo-px-5 plasmo-py-3.5 plasmo-flex-1 plasmo-min-w-0">
@@ -24,6 +25,11 @@ export function PromptRow({
                         {vc > 0 && (
                             <span className="plasmo-text-[11px] plasmo-text-[var(--dim)] plasmo-mr-2">
                                 {vc} var{vc > 1 ? "s" : ""}
+                            </span>
+                        )}
+                        {uc > 0 && (
+                            <span className="plasmo-text-[11px] plasmo-text-[var(--dim)] plasmo-mr-2">
+                                {uc} use{uc > 1 ? "s" : ""}
                             </span>
                         )}
                         {prompt.description || ""}
