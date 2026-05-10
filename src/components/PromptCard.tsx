@@ -54,9 +54,7 @@ export function PromptCard({
                     </button>
 
                     <button
-                        onClick={() => {
-                            if (window.confirm(`Delete "${prompt.label}"?`)) onDelete(prompt.id)
-                        }}
+                        onClick={() => onDelete(prompt.id)}
                         className="plasmo-flex plasmo-h-6 plasmo-w-6 plasmo-items-center plasmo-justify-center plasmo-text-[var(--muted)] hover:plasmo-bg-red-500/10 hover:plasmo-text-red-500"
                         aria-label="Delete"
                     >

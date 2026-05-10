@@ -10,6 +10,7 @@ import { PromptCard } from "~components/PromptCard"
 import { PromptRow } from "~components/PromptRow"
 import { ViewToggle } from "~components/ViewToggle"
 import { FormModal } from "~components/FormModal"
+import { DeleteConfirmModal } from "~components/DeleteConfirmModal"
 import { Icons } from "~components/Icons"
 
 const PROMPTS_STORAGE_KEY = "skillprompts_prompts"
@@ -26,6 +27,7 @@ function OptionsIndex() {
     const [showForm, setShowForm] = useState(false)
     const [editingId, setEditingId] = useState<string | null>(null)
     const [viewPrompt, setViewPrompt] = useState<Prompt | null>(null)
+    const [pendingDelete, setPendingDelete] = useState<Prompt | null>(null)
     const [showLibrary, setShowLibrary] = useState(false)
     const [searchTerm, setSearchTerm] = useState("")
     const [copiedId, setCopiedId] = useState<string | null>(null)
@@ -141,7 +143,17 @@ function OptionsIndex() {
         closeForm()
     }
 
-    const handleDelete = (id: string) => setPrompts(p => p.filter(x => x.id !== id))
+    const handleDelete = (id: string) => {
+        const p = prompts.find(x => x.id === id)
+        if (p) setPendingDelete(p)
+    }
+
+    const confirmDelete = () => {
+        if (pendingDelete) {
+            setPrompts(p => p.filter(x => x.id !== pendingDelete.id))
+            setPendingDelete(null)
+        }
+    }
 
     const existingLabels = useMemo(() => new Set(prompts.map(p => p.label.toLowerCase())), [prompts])
 
@@ -277,6 +289,15 @@ function OptionsIndex() {
                 />
             )}
 
+            {/* ── Delete Confirm Modal ── */}
+            {pendingDelete && (
+                <DeleteConfirmModal
+                    label={pendingDelete.label}
+                    onConfirm={confirmDelete}
+                    onClose={() => setPendingDelete(null)}
+                />
+            )}
+
             <div className="plasmo-mx-auto plasmo-px-6 plasmo-py-4 plasmo-flex plasmo-flex-col plasmo-gap-6">
 
                 {/* ── Header ── */}
@@ -284,7 +305,7 @@ function OptionsIndex() {
                     <div className="plasmo-flex plasmo-items-center plasmo-gap-3.5">
                         <Logo width={42} height={42} color={isDark ? "var(--accent)" : "#148EFF"} />
                         <div className="plasmo-flex plasmo-flex-col plasmo-items-start plasmo-leading-tight">
-                            <span className="plasmo-text-[26px] plasmo-tracking-tighter" style={{ color: isDark ? "#FFFFFF" : "#0F1117" }}>
+                            <span className="plasmo-text-[20px] plasmo-tracking-tighter" style={{ color: isDark ? "#FFFFFF" : "#0F1117" }}>
                                 SkillPrompts
                             </span>
                             <span className="plasmo-text-[11px] plasmo-text-[var(--muted)]">v1.0</span>
@@ -361,8 +382,9 @@ function OptionsIndex() {
                 {/* ── Content ── */}
                 {filteredPrompts.length === 0 ? (
                     <div className="plasmo-flex plasmo-flex-col plasmo-items-center plasmo-justify-center plasmo-py-24 plasmo-gap-5">
-                        <div className="plasmo-w-14 plasmo-h-14  plasmo-bg-[var(--hover)] plasmo-border plasmo-border-[var(--border)] plasmo-flex plasmo-items-center plasmo-justify-center plasmo-text-[var(--dim)]">
-                            <Logo width={24} height={24} color="currentColor" />
+                        <div className="plasmo-w-14 plasmo-h-14  plasmo-flex plasmo-items-center plasmo-justify-center plasmo-text-[var(--dim)]">
+                            {/* <Logo width={24} height={24} color="currentColor" /> */}
+                            <Icons.inbox />
                         </div>
                         <div className="plasmo-text-center">
                             <p className="plasmo-text-[14px] plasmo-font-medium plasmo-text-[var(--muted)]">

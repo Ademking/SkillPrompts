@@ -58,7 +58,7 @@ export function PromptRow({
                 <button onClick={() => onEdit(prompt)} className="plasmo-flex plasmo-h-8 plasmo-w-8 plasmo-items-center plasmo-justify-center plasmo-text-[var(--muted)] plasmo-transition-colors hover:plasmo-bg-[var(--hover)] hover:plasmo-text-[var(--text)]" aria-label="Edit">
                     <Icons.edit />
                 </button>
-                <button onClick={() => { if (window.confirm(`Delete "${prompt.label}"?`)) onDelete(prompt.id) }} className="plasmo-flex plasmo-h-8 plasmo-w-8 plasmo-items-center plasmo-justify-center plasmo-text-[var(--muted)] plasmo-transition-colors hover:plasmo-bg-red-500/10 hover:plasmo-text-red-500" aria-label="Delete">
+                <button onClick={() => onDelete(prompt.id)} className="plasmo-flex plasmo-h-8 plasmo-w-8 plasmo-items-center plasmo-justify-center plasmo-text-[var(--muted)] plasmo-transition-colors hover:plasmo-bg-red-500/10 hover:plasmo-text-red-500" aria-label="Delete">
                     <Icons.trash />
                 </button>
             </div>

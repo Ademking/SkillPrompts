@@ -5,6 +5,11 @@
         "prompt": "I want you to act as a professional writing assistant. I will provide a text, and you will rewrite it in a more formal tone while preserving the original meaning. Improve vocabulary, structure, and clarity to make it suitable for academic or professional contexts. My text is:"
     },
     {
+        "label": "explain",
+        "description": "Simplify a complex topic",
+        "prompt": "Explain the concept of {{ topic }} as if I am a {{ age_group }} with no prior knowledge. Make it easier to understand. Keep it under 200 words."
+    },
+    {
         "label": "professionalizer",
         "description": "Make text more professional for work/business",
         "prompt": "I want you to act as a business communication expert. I will provide a text, and you will rewrite it to sound more professional, polished, and suitable for workplace or business communication. Keep it clear, concise, and impactful. My text is:"
@@ -23,6 +28,16 @@
         "label": "expander",
         "description": "Make text longer with more detail",
         "prompt": "I want you to act as a content expansion assistant. I will provide a short text, and you will expand it into a longer, more detailed version while keeping the original meaning. Add clarity, examples, and richer explanation where appropriate. My text is:"
+    },
+    {
+        "label": "practice",
+        "description": "Chat in a foreign language with corrections",
+        "prompt": "I want to practice my {{ language }} skills at a {{ level }} level. Start a short conversation with me about {{ topic }}. After I reply, point out one mistake I made and suggest a more natural way to say it, then ask me a follow-up question."
+    },
+    {
+        "label": "compare",
+        "description": "Compare two or more options",
+        "prompt": "I want you to act as a critical analyst. Compare {{ option_a }} and {{ option_b }} based on these criteria: {{ criteria }}. Provide the results in a Markdown table, then give a final recommendation based on which is better."
     },
     {
         "label": "simplifier",
@@ -78,6 +93,11 @@
         "label": "linkedin-comment",
         "description": "Generate engaging LinkedIn comments",
         "prompt": "I want you to act as a LinkedIn engagement specialist. I will provide a post or topic, and you will generate meaningful, natural, and non-generic comments that add value, start conversations, or show expertise without sounding robotic. My input is:"
+    },
+    {
+        "label": "data_model",
+        "description": "Design a data structure for a feature",
+        "prompt": "I want you to act as a Database Engineer. I need to design a data model for a {{ feature_name }} that tracks {{ entities }}. Suggest the optimal JSON structure or SQL table schema to efficiently store and query this data, considering relationships, indexing, and scalability."
     },
     {
         "label": "facebook-post",
@@ -611,8 +631,8 @@
     },
     {
         "label": "translate",
-        "description": "Act as a English Translator and Improver",
-        "prompt": "I want you to act as an English translator, spelling corrector and improver. I will speak to you in any language and you will detect the language, translate it and answer in the corrected and improved version of my text, in English. I want you to replace my simplified A0-level words and sentences with more beautiful and elegant, upper level English words and sentences. Keep the meaning same, but make them more literary. I want you to only reply the correction, the improvements and nothing else, do not write explanations. My first sentence is :"
+        "description": "Act as a Translator and Improver",
+        "prompt": "I want you to act as an {{ language }} translator, spelling corrector and improver. I will speak to you in any language and you will detect the language, translate it and answer in the corrected and improved version of my text, in {{ language }}. I want you to replace my simplified A0-level words and sentences with more beautiful and elegant, upper level {{ language }} words and sentences. Keep the meaning same, but make them more literary. I want you to only reply the correction, the improvements and nothing else, do not write explanations. My first sentence is :"
     },
     {
         "label": "spoken-english-teacher-and-improver",
@@ -777,7 +797,7 @@
     {
         "label": "chef",
         "description": "Act as a Chef",
-        "prompt": "I require someone who can suggest delicious recipes that includes foods which are nutritionally beneficial but also easy & not time consuming enough therefore suitable for busy people like us among other factors such as cost effectiveness so overall dish ends up being healthy yet economical at same time! My first request is : "
+        "prompt": "I require someone who can suggest delicious recipes that includes foods which are nutritionally beneficial but also easy & not time consuming enough therefore suitable for busy people like us among other factors such as cost effectiveness so overall dish ends up being healthy yet economical at same time! I have {{ ingredients }}. My first request is : "
     },
     {
         "label": "excel-sheet",

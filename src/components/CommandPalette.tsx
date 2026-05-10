@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from "react"
 import type { FC } from "react"
 import Logo from "./Logo"
+import { Icons } from "./Icons"
 
 interface Command {
     id: string
@@ -125,7 +126,8 @@ const CommandPalette: FC<Props> = ({
                     {filtered.length === 0 && (
                         <div className={`plasmo-flex plasmo-flex-col plasmo-items-center plasmo-justify-center plasmo-gap-1.5 plasmo-py-8 plasmo-text-center ${textMuted}`}>
                             <div className="plasmo-text-2xl">
-                                <Logo width={32} height={32} />
+                                {/* <Logo width={32} height={32} /> */}
+                                <Icons.inbox />
                             </div>
                             <div className="plasmo-text-sm plasmo-font-medium">No skills found</div>
                             <button

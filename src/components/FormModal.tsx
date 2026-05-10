@@ -59,7 +59,7 @@ export function FormModal({
             ; (CSS as any).highlights.delete("form-var-highlight")
             if (ranges.length > 0) {
                 const highlight = new Highlight(...ranges)
-                ; (CSS as any).highlights.set("form-var-highlight", highlight)
+                    ; (CSS as any).highlights.set("form-var-highlight", highlight)
             }
         } catch (e) {
             // ignore
@@ -121,7 +121,7 @@ export function FormModal({
                         <div className="plasmo-flex plasmo-items-center plasmo-gap-2.5">
                             <div className="plasmo-w-2 plasmo-h-2 plasmo-bg-[var(--accent)]" />
                             <span className="plasmo-text-[14px] plasmo-font-semibold plasmo-text-[var(--text)]">
-                                {editingId ? "Edit prompt" : "New prompt"}
+                                {editingId ? "Edit Skill" : "New Skill"}
                             </span>
                         </div>
                         <button onClick={onClose} className="plasmo-flex plasmo-h-8 plasmo-w-8 plasmo-items-center plasmo-justify-center  plasmo-text-[var(--muted)] plasmo-transition-colors hover:plasmo-bg-[var(--hover)] hover:plasmo-text-[var(--text)]">
