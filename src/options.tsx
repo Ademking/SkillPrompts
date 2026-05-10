@@ -298,7 +298,7 @@ function OptionsIndex() {
                             onClick={() => setShowLibrary(true)}
                             className="plasmo-inline-flex plasmo-items-center plasmo-gap-2 plasmo-h-9 plasmo-px-4 plasmo-border plasmo-border-[var(--border)] plasmo-text-[13px] plasmo-font-light plasmo-transition-all hover:plasmo-opacity-90 active:plasmo-scale-[0.97]"
                         >
-                            <Icons.folder /> Library
+                            <Icons.folder /> Explore Skills
                         </button>
                         <ViewToggle viewMode={viewMode} onToggle={toggleView} />
                         <button
@@ -338,16 +338,24 @@ function OptionsIndex() {
                                 {searchTerm ? `No results for "${searchTerm}"` : "No skills yet"}
                             </p>
                             <p className="plasmo-text-[12.5px] plasmo-text-[var(--dim)] plasmo-mt-1">
-                                {searchTerm ? "Try a different search term" : 'Click "Create New Skill" to create your first one'}
+                                {searchTerm ? "Try a different search term" : 'Build a custom skill from scratch or browse our ready-to-use library'}
                             </p>
                         </div>
                         {!searchTerm && (
-                            <button
-                                onClick={() => openForm()}
-                                className="plasmo-inline-flex plasmo-items-center plasmo-gap-2 plasmo-h-9 plasmo-px-4  plasmo-bg-[var(--accent)] plasmo-text-white plasmo-text-[12px] plasmo-font-semibold plasmo-transition-all hover:plasmo-opacity-90 active:plasmo-scale-[0.97]"
-                            >
-                                <Icons.plus /> Create New Skill
-                            </button>
+                            <div className="plasmo-flex plasmo-items-center plasmo-gap-3">
+                                <button
+                                    onClick={() => openForm()}
+                                    className="plasmo-inline-flex plasmo-items-center plasmo-gap-2 plasmo-h-9 plasmo-px-4  plasmo-bg-[var(--accent)] plasmo-text-white plasmo-text-[12px] plasmo-font-semibold plasmo-transition-all hover:plasmo-opacity-90 active:plasmo-scale-[0.97]"
+                                >
+                                    <Icons.plus /> Create New Skill
+                                </button>
+                                <button
+                                    onClick={() => setShowLibrary(true)}
+                                    className="plasmo-inline-flex plasmo-items-center plasmo-gap-2 plasmo-h-9 plasmo-px-4 plasmo-border plasmo-border-[var(--border)] plasmo-text-[13px] plasmo-font-light plasmo-transition-all hover:plasmo-opacity-90 active:plasmo-scale-[0.97]"
+                                >
+                                    <Icons.folder /> Explore Skills
+                                </button>
+                            </div>
                         )}
                     </div>
                 ) : viewMode === "grid" ? (
