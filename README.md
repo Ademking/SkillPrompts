@@ -1,8 +1,8 @@
-# SkillPrompts
-
 <p align="center">
   <img src="assets/icon.png" alt="SkillPrompts Logo" width="100">
 </p>
+
+<h1 align="center">SkillPrompts</h1>
 
 A browser extension to create, organize, and reuse customizable AI prompts across multiple AI chat platforms for faster, more efficient interactions.
 
@@ -11,6 +11,11 @@ A browser extension to create, organize, and reuse customizable AI prompts acros
 - Create and manage a library of AI skill prompts with customizable variables.
 - Quickly insert prompts into ChatGPT and other supported sites.
 - Contains a variety of pre-built prompts for different use cases.
+
+## Demo
+
+https://github.com/user-attachments/assets/cb51fa3c-1dd8-44b9-80d8-9dbb0e39a983
+
 
 ## Supported Sites
 
