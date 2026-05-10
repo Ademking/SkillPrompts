@@ -18,34 +18,34 @@ export function PromptRow({
     const uc = usage || 0
     return (
         <div className="plasmo-flex plasmo-items-stretch plasmo-min-h-0 plasmo-transition-colors plasmo-duration-150 hover:plasmo-bg-[var(--hover)]">
-            <div className="plasmo-flex plasmo-items-center plasmo-gap-4 plasmo-px-5 plasmo-py-3.5 plasmo-flex-1 plasmo-min-w-0">
+            <div className="plasmo-flex plasmo-items-start plasmo-gap-4 plasmo-px-5 plasmo-py-3.5 plasmo-flex-1 plasmo-min-w-0">
                 <div className="plasmo-min-w-0 plasmo-flex-[2]">
                     <span className="plasmo-text-[14px] plasmo-font-semibold plasmo-text-[var(--accent)] plasmo-bg-[var(--accent-bg)] plasmo-px-1.5 plasmo-py-0.5">/{prompt.label}</span>
-                    <p className="plasmo-text-[12px] plasmo-text-[var(--muted)] plasmo-mt-0.5 plasmo-truncate">
-                        {vc > 0 && (
-                            <span className="plasmo-text-[11px] plasmo-text-[var(--dim)] plasmo-mr-2">
-                                {vc} var{vc > 1 ? "s" : ""}
-                            </span>
-                        )}
-                        {uc > 0 && (
-                            <span className="plasmo-text-[11px] plasmo-text-[var(--dim)] plasmo-mr-2">
-                                {uc} use{uc > 1 ? "s" : ""}
-                            </span>
-                        )}
-                        {prompt.description || ""}
-                    </p>
+                    <p className="plasmo-text-[12px] plasmo-text-[var(--muted)] plasmo-mt-0.5 plasmo-truncate">{prompt.description || ""}</p>
                 </div>
 
-                <pre className="plasmo-flex-[3] plasmo-min-w-0 plasmo-px-3.5 plasmo-py-2 plasmo-bg-[var(--code-bg)] plasmo-font-mono plasmo-text-[12px] plasmo-leading-relaxed plasmo-text-[var(--muted)] plasmo-overflow-hidden plasmo-truncate">
-                    {prompt.template.split(/(\{\{\s*\w+\s*\}\})/g).map((seg, i) => {
-                        const m = seg.match(/^\{\{\s*(\w+)\s*\}\}$/)
-                        if (m) {
-                            const name = m[1].toUpperCase()
-                            return <span key={i} className="plasmo-inline-flex plasmo-items-center plasmo-px-1.5 plasmo-py-0 plasmo-text-[10px] plasmo-font-semibold plasmo-leading-tight plasmo-bg-amber-500/15 plasmo-text-amber-400 plasmo-border plasmo-border-amber-500/20">{name}</span>
-                        }
-                        return seg
-                    })}
-                </pre>
+                <div className="plasmo-flex-[3] plasmo-flex plasmo-flex-col plasmo-min-w-0">
+                    <pre className="plasmo-min-w-0 plasmo-px-3.5 plasmo-py-1 plasmo-bg-[var(--code-bg)] plasmo-font-mono plasmo-text-[12px] plasmo-leading-relaxed plasmo-text-[var(--muted)] plasmo-overflow-hidden plasmo-truncate">
+                        {prompt.template.split(/(\{\{\s*\w+\s*\}\})/g).map((seg, i) => {
+                            const m = seg.match(/^\{\{\s*(\w+)\s*\}\}$/)
+                            if (m) {
+                                const name = m[1].toUpperCase()
+                                return <span key={i} className="plasmo-inline-flex plasmo-items-center plasmo-px-1.5 plasmo-py-0 plasmo-text-[10px] plasmo-font-semibold plasmo-leading-tight plasmo-bg-amber-500/15 plasmo-text-amber-400 plasmo-border plasmo-border-amber-500/20">{name}</span>
+                            }
+                            return seg
+                        })}
+                    </pre>
+                    <div className="plasmo-flex plasmo-items-center plasmo-gap-3 plasmo-px-3.5 plasmo-pt-2 plasmo-pb-0">
+                        <span className="plasmo-inline-flex plasmo-items-center plasmo-gap-1 plasmo-text-[10px] plasmo-font-medium plasmo-text-amber-400/70">
+                            <svg width="10" height="10" viewBox="0 0 8 8" fill="none" stroke="currentColor" strokeWidth="1.5"><path d="M2 1L6 4L2 7" /></svg>
+                            Variables: {vc}
+                        </span>
+                        <span className="plasmo-inline-flex plasmo-items-center plasmo-gap-1 plasmo-text-[10px] plasmo-font-medium plasmo-text-blue-400/60">
+                            <svg width="10" height="10" viewBox="0 0 8 8" fill="none" stroke="currentColor" strokeWidth="1.5"><circle cx="4" cy="4" r="3" /></svg>
+                            Usage: {uc}
+                        </span>
+                    </div>
+                </div>
             </div>
 
             <div className="plasmo-flex plasmo-items-center plasmo-gap-0.5 plasmo-px-2 plasmo-border-l plasmo-border-[var(--border)]">

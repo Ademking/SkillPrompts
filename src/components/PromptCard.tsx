@@ -28,19 +28,7 @@ export function PromptCard({
                         </span>
                     </div>
 
-                    <p className="plasmo-mt-0.5 plasmo-text-[11px] plasmo-text-[var(--muted)] plasmo-line-clamp-1">
-                        {vc > 0 && (
-                            <span className="plasmo-text-[10px] plasmo-font-medium plasmo-text-[var(--dim)] plasmo-mr-2">
-                                {vc} var{vc > 1 ? "s" : ""}
-                            </span>
-                        )}
-                        {uc > 0 && (
-                            <span className="plasmo-text-[10px] plasmo-text-[var(--dim)] plasmo-mr-2">
-                                {uc} use{uc > 1 ? "s" : ""}
-                            </span>
-                        )}
-                        {prompt.description || ""}
-                    </p>
+                    <span className="plasmo-text-[11px] plasmo-text-[var(--muted)] plasmo-line-clamp-1">{prompt.description || ""}</span>
                 </div>
 
                 <div className="plasmo-flex plasmo-shrink-0 plasmo-items-center plasmo-gap-0 plasmo-opacity-0 group-hover:plasmo-opacity-100 plasmo-transition-opacity">
@@ -104,6 +92,17 @@ export function PromptCard({
                     })}
                 </pre>
 
+            </div>
+
+            <div className="plasmo-flex plasmo-items-center plasmo-gap-2.5 plasmo-px-4 plasmo-pb-3">
+                <span className="plasmo-inline-flex plasmo-items-center plasmo-gap-1 plasmo-text-[10px] plasmo-font-medium plasmo-text-amber-400/70">
+                    <svg width="10" height="10" viewBox="0 0 8 8" fill="none" stroke="currentColor" strokeWidth="1.5"><path d="M2 1L6 4L2 7" /></svg>
+                    Variables: {vc}
+                </span>
+                <span className="plasmo-inline-flex plasmo-items-center plasmo-gap-1 plasmo-text-[10px] plasmo-font-medium plasmo-text-blue-400/60">
+                    <svg width="10" height="10" viewBox="0 0 8 8" fill="none" stroke="currentColor" strokeWidth="1.5"><circle cx="4" cy="4" r="3" /></svg>
+                    Usage: {uc}
+                </span>
             </div>
 
             <div className="plasmo-px-4 plasmo-pb-3 plasmo-mt-auto">

@@ -31,6 +31,7 @@ function OptionsIndex() {
     const [viewPrompt, setViewPrompt] = useState<Prompt | null>(null)
     const [pendingDelete, setPendingDelete] = useState<Prompt | null>(null)
     const [showLibrary, setShowLibrary] = useState(false)
+    const [showAbout, setShowAbout] = useState(false)
     const [searchTerm, setSearchTerm] = useState("")
     const [copiedId, setCopiedId] = useState<string | null>(null)
     const [toastVisible, setToastVisible] = useState(false)
@@ -176,7 +177,7 @@ function OptionsIndex() {
     }
 
     const handleKeyDown = (e: React.KeyboardEvent) => {
-        if (e.key === "Escape") { closeForm(); setViewPrompt(null); setShowLibrary(false) }
+        if (e.key === "Escape") { closeForm(); setViewPrompt(null); setShowLibrary(false); setShowAbout(false) }
     }
 
     const toggleView = () => {
@@ -305,6 +306,41 @@ function OptionsIndex() {
                 />
             )}
 
+            {/* ── About Modal ── */}
+            {showAbout && (
+                <div
+                    className="plasmo-fixed plasmo-inset-0 plasmo-z-50 plasmo-flex plasmo-items-center plasmo-justify-center plasmo-p-4 modal-overlay"
+                    style={{ background: "rgba(0,0,0,0.6)", backdropFilter: "blur(8px)" }}
+                    onClick={() => setShowAbout(false)}
+                >
+                    <div
+                        className="plasmo-w-full plasmo-max-w-sm modal-content"
+                        onClick={e => e.stopPropagation()}
+                    >
+                        <div className="plasmo-border plasmo-border-[var(--border-hover)] plasmo-bg-[var(--card)] plasmo-shadow-[0_24px_64px_var(--shadow)] plasmo-overflow-hidden">
+                            <div className="plasmo-flex plasmo-flex-col plasmo-items-center plasmo-justify-center plasmo-py-10 plasmo-px-6 plasmo-gap-4">
+                                <Logo width={56} height={56} color={isDark ? "var(--accent)" : "#148EFF"} />
+                                <div className="plasmo-text-center">
+                                    <p className="plasmo-text-[18px] plasmo-font-semibold plasmo-text-[var(--text)]">SkillPrompts</p>
+                                    <p className="plasmo-text-[12px] plasmo-text-[var(--muted)] plasmo-mt-0.5">v1.0</p>
+                                </div>
+                                <p className="plasmo-text-[12.5px] plasmo-text-[var(--muted)] plasmo-text-center plasmo-leading-relaxed">
+                                    A Chrome extension to manage and use AI skill prompts for ChatGPT. Create, organize, and quickly insert prompts with variables.
+                                </p>
+                            </div>
+                            <div className="plasmo-flex plasmo-items-center plasmo-justify-center plasmo-px-6 plasmo-py-3 plasmo-border-t plasmo-border-[var(--border)] plasmo-bg-[var(--hover)]">
+                                <button
+                                    onClick={() => setShowAbout(false)}
+                                    className="plasmo-h-9 plasmo-px-6 plasmo-border plasmo-border-[var(--border)] plasmo-text-[12px] plasmo-font-medium plasmo-text-[var(--muted)] plasmo-transition-colors hover:plasmo-bg-[var(--hover)] hover:plasmo-text-[var(--text)]"
+                                >
+                                    Close
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            )}
+
             <div className="plasmo-mx-auto plasmo-px-6 plasmo-py-4 plasmo-flex plasmo-flex-col plasmo-gap-6">
 
                 {/* ── Header ── */}
@@ -332,6 +368,12 @@ function OptionsIndex() {
                             className="plasmo-inline-flex plasmo-items-center plasmo-gap-2 plasmo-h-9 plasmo-px-4 plasmo-border plasmo-border-[var(--border)] plasmo-text-[13px] plasmo-font-light plasmo-transition-all hover:plasmo-opacity-90 active:plasmo-scale-[0.97]"
                         >
                             <Icons.folder /> Explore Skills
+                        </button>
+                        <button
+                            onClick={() => setShowAbout(true)}
+                            className="plasmo-inline-flex plasmo-items-center plasmo-gap-2 plasmo-h-9 plasmo-px-4 plasmo-border plasmo-border-[var(--border)] plasmo-text-[13px] plasmo-font-light plasmo-transition-all hover:plasmo-opacity-90 active:plasmo-scale-[0.97]"
+                        >
+                            <Icons.info /> About
                         </button>
 
                         <button
