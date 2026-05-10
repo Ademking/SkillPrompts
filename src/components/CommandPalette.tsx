@@ -98,12 +98,12 @@ const CommandPalette: FC<Props> = ({
                                 else if (e.key === "Enter") { e.preventDefault(); selectCommand(selectedIndex) }
                                 else if (e.key === "Escape") { onClose() }
                             }}
-                            placeholder="Search AI commands..."
+                            placeholder="Search AI skills..."
                             className={`plasmo-w-full plasmo-bg-transparent plasmo-text-sm plasmo-font-medium plasmo-outline-none plasmo-placeholder:plasmo-font-normal ${D ? "plasmo-text-white placeholder:plasmo-text-neutral-500" : "plasmo-text-neutral-900 placeholder:plasmo-text-neutral-400"
                                 }`}
                         />
                         <div className={`plasmo-mt-0.5 plasmo-text-xs ${textMuted}`}>
-                            {filtered.length} commands available
+                            {filtered.length} skills available
                         </div>
                     </div>
 
@@ -129,7 +129,7 @@ const CommandPalette: FC<Props> = ({
                             <div className="plasmo-text-2xl">
                                 <Logo width={32} height={32} />
                             </div>
-                            <div className="plasmo-text-sm plasmo-font-medium">No commands found</div>
+                            <div className="plasmo-text-sm plasmo-font-medium">No skills found</div>
                             <button
                                 onClick={() => {
                                     chrome.runtime.sendMessage({
@@ -139,7 +139,7 @@ const CommandPalette: FC<Props> = ({
                                 className="plasmo-inline-flex plasmo-items-center plasmo-gap-1.5 plasmo-h-8 plasmo-px-3 plasmo-text-xs plasmo-font-medium plasmo-text-[var(--text)] plasmo-bg-transparent plasmo-border plasmo-border-[var(--border)] plasmo-transition-all hover:plasmo-bg-[var(--accent-bg)] hover:plasmo-text-[var(--accent)] hover:plasmo-border-[var(--accent-border)]"
                             >
                                 <span className="plasmo-text-base leading-none">+</span>
-                                Add Command
+                                Create New Skill
                             </button>
                         </div>
                     )}
@@ -202,11 +202,12 @@ const CommandPalette: FC<Props> = ({
                         <span>↵ Select</span>
                         <span>Esc Close</span>
                     </div>
+
                     <button onClick={() => {
                         chrome.runtime.sendMessage({
                             type: "OPEN_OPTIONS"
                         })
-                    }} className={`plasmo-font-medium plasmo-transition-colors hover:plasmo-text-blue-500 ${D ? "plasmo-text-neutral-300 hover:plasmo-text-blue-500" : "plasmo-text-neutral-500"}`}>+ Add Command</button>
+                    }} className={`plasmo-font-medium plasmo-transition-colors hover:plasmo-text-blue-500 ${D ? "plasmo-text-neutral-300 hover:plasmo-text-blue-500" : "plasmo-text-neutral-500"}`}>+ Create Skill</button>
                 </div>
             </div>
         </div>
