@@ -20,7 +20,7 @@ export function LibraryModal({ onImport, onClose, existingLabels }: { onImport: 
     return (
         <div
             className="plasmo-fixed plasmo-inset-0 plasmo-z-50 plasmo-flex plasmo-items-center plasmo-justify-center plasmo-p-4 modal-overlay"
-            style={{ background: "rgba(0,0,0,0.6)", backdropFilter: "blur(12px)" }}
+            style={{ background: "rgba(0,0,0,0.6)", backdropFilter: "blur(8px)" }}
             onClick={onClose}
         >
             <div
@@ -32,7 +32,7 @@ export function LibraryModal({ onImport, onClose, existingLabels }: { onImport: 
                     <div className="plasmo-flex plasmo-items-center plasmo-justify-between plasmo-px-5 plasmo-py-2 plasmo-border-b plasmo-border-[var(--border)]">
                         <div className="plasmo-flex plasmo-items-center plasmo-gap-2.5">
                             <div className="plasmo-w-2 plasmo-h-2 plasmo-bg-[var(--accent)]" />
-                            <span className="plasmo-text-[14px] plasmo-font-semibold plasmo-text-[var(--text)]">Prompt Library</span>
+                            <span className="plasmo-text-[14px] plasmo-font-semibold plasmo-text-[var(--text)]">Explore Skills</span>
                         </div>
                         <button onClick={onClose} className="plasmo-flex plasmo-h-8 plasmo-w-8 plasmo-items-center plasmo-justify-center plasmo-text-[var(--muted)] plasmo-transition-colors hover:plasmo-bg-[var(--hover)] hover:plasmo-text-[var(--text)]">
                             <Icons.x />

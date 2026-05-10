@@ -3,6 +3,7 @@ import { useEffect, useMemo, useRef, useState } from "react"
 
 import { Storage } from "@plasmohq/storage"
 import CommandPalette from "./components/CommandPalette"
+import { VariableModal } from "./components/VariableModal"
 import type { PlasmoCSConfig } from "plasmo"
 
 const styleElement = document.createElement("style")
@@ -29,6 +30,12 @@ export const getStyle = (): HTMLStyleElement => {
 const PROMPTS_STORAGE_KEY = "skillprompts_prompts"
 const ENABLED_STORAGE_KEY = "skillprompts_enabled"
 
+function extractVariables(template: string): string[] {
+  const matches = template.match(/\{\{(\w+)\}\}/g)
+  if (!matches) return []
+  return [...new Set(matches.map(m => m.slice(2, -2)))]
+}
+
 type StoredPrompt = {
   id: string
   label: string
@@ -48,7 +55,7 @@ const CommandPaletteUI = () => {
   const hideMenuTimeoutRef = useRef<number | null>(null)
   const highlightedRangesRef = useRef<Range[]>([])
   const ignoreMutationsRef = useRef(false)
-  const highlightRef = useRef<() => void>(() => {})
+  const highlightRef = useRef<() => void>(() => { })
   const storage = useMemo(() => new Storage({ area: "local" }), [])
 
   // Inject highlight styling into main document
@@ -109,6 +116,10 @@ const CommandPaletteUI = () => {
   const [storedCommands, setStoredCommands] = useState<StoredPrompt[]>([])
   const [hasLoadedCommands, setHasLoadedCommands] = useState(false)
   const [isEnabled, setIsEnabled] = useState(true)
+  const [showVarModal, setShowVarModal] = useState(false)
+  const [varModalLabel, setVarModalLabel] = useState("")
+  const [varModalTemplate, setVarModalTemplate] = useState("")
+  const [varModalVars, setVarModalVars] = useState<string[]>([])
 
   // Helper: find all elements with contenteditable (any value except "false"), including inside shadow roots
   const getAllContentEditables = () => {
@@ -297,17 +308,39 @@ const CommandPaletteUI = () => {
   highlightRef.current = highlightExistingCommands
 
   const replaceCommandsWithPrompts = () => {
-    const replaceText = (text: string) => {
-      let updatedText = text
+    const expandCommand = (match: string, label: string): string => {
+      const cmd = storedCommands.find(p => p.label === label)
+      if (!cmd) return match
 
-      for (const cmd of storedCommands) {
-        const template = `/${cmd.label}`
-        if (updatedText.includes(template)) {
-          const replacement = cmd.template || ""
-          updatedText = updatedText.replace(new RegExp(template.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"), "g"), replacement)
-        }
+      const varRegex = /(\w+)="([^"]*)"/g
+      const vars: Record<string, string> = {}
+      let varMatch
+      while ((varMatch = varRegex.exec(match)) !== null) {
+        vars[varMatch[1]] = varMatch[2]
       }
 
+      const templateVars = extractVariables(cmd.template || "")
+      let result = cmd.template || ""
+
+      if (templateVars.length > 0) {
+        for (const vName of templateVars) {
+          const val = vars[vName] || ""
+          result = result.replace(new RegExp(`\\{\\{${vName}\\}\\}`, "g"), val)
+        }
+        result = result.replace(/\{\{\w+\}\}/g, "")
+      }
+
+      return result
+    }
+
+    const replaceText = (text: string) => {
+      let updatedText = text
+      for (const cmd of storedCommands) {
+        const escapedLabel = cmd.label.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")
+        const pattern = `\\/${escapedLabel}(?:\\s+\\w+="[^"]*")*\\s*`
+        const regex = new RegExp(pattern, "g")
+        updatedText = updatedText.replace(regex, (match) => expandCommand(match, cmd.label))
+      }
       return updatedText
     }
 
@@ -328,18 +361,19 @@ const CommandPaletteUI = () => {
 
     contentEditables.forEach((element) => {
       const walker = document.createTreeWalker(element, NodeFilter.SHOW_TEXT, null)
-      const nodesToReplace: { node: Text; replacements: { from: string; to: string }[] }[] = []
+      const nodesToReplace: { node: Text; replacements: { pattern: RegExp; cmd: StoredPrompt }[] }[] = []
 
       let node
       while ((node = walker.nextNode())) {
         const textNode = node as Text
         const text = textNode.nodeValue || ""
-        const replacements: { from: string; to: string }[] = []
+        const replacements: { pattern: RegExp; cmd: StoredPrompt }[] = []
 
         for (const cmd of storedCommands) {
-          const from = `/${cmd.label}`
-          if (text.includes(from)) {
-            replacements.push({ from, to: cmd.template || "" })
+          const escapedLabel = cmd.label.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")
+          const pattern = new RegExp(`\\/${escapedLabel}(?:\\s+\\w+="[^"]*")*\\s*`)
+          if (pattern.test(text)) {
+            replacements.push({ pattern, cmd })
           }
         }
 
@@ -351,8 +385,8 @@ const CommandPaletteUI = () => {
       nodesToReplace.forEach(({ node, replacements }) => {
         let newText = node.nodeValue || ""
 
-        for (const { from, to } of replacements) {
-          newText = newText.replace(new RegExp(from.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"), "g"), to)
+        for (const { pattern, cmd } of replacements) {
+          newText = newText.replace(pattern, (match) => expandCommand(match, cmd.label))
         }
 
         node.nodeValue = newText
@@ -732,17 +766,17 @@ const CommandPaletteUI = () => {
   }
 
   // This replaces the previous static onCommandSelect handler logic using storedCommands
-  const handleCommandSelectInternal = (command: string) => {
+  const insertIntoInput = (text: string) => {
     const target = targetRef.current
-    const normalizedCommand = command.replace(/^\//, "")
-    const commandWithSpace = `${normalizedCommand} `
+    const words = text.split(" ")
+    const firstWord = words[0] || ""
 
     if (target instanceof HTMLInputElement || target instanceof HTMLTextAreaElement) {
       const range = selectionRangeRef.current
       const start = range?.start ?? target.selectionStart ?? target.value.length
       const end = range?.end ?? target.selectionEnd ?? target.value.length
 
-      target.setRangeText(commandWithSpace, start, end, "end")
+      target.setRangeText(text, start, end, "end")
       target.dispatchEvent(new Event("input", { bubbles: true }))
       target.dispatchEvent(new Event("change", { bubbles: true }))
     } else if (target?.isContentEditable) {
@@ -751,17 +785,14 @@ const CommandPaletteUI = () => {
 
       if (range) {
         try {
-          // Replace the current range with a text node containing the command
           range.deleteContents()
-          const textNode = document.createTextNode(commandWithSpace)
+          const textNode = document.createTextNode(text)
           range.insertNode(textNode)
 
-          // Create a highlight range for the command token (without trailing space)
           const highlightRange = document.createRange()
           highlightRange.setStart(textNode, 0)
-          highlightRange.setEnd(textNode, normalizedCommand.length)
+          highlightRange.setEnd(textNode, firstWord.length)
 
-          // Store and apply highlight
           highlightedRangesRef.current = [...highlightedRangesRef.current, highlightRange]
           try {
             const highlight = new Highlight(highlightRange)
@@ -770,39 +801,27 @@ const CommandPaletteUI = () => {
             console.error("Failed to set highlight:", err)
           }
 
-          // Move caret after inserted text
           const sel = window.getSelection()
           if (sel) {
             sel.removeAllRanges()
             const after = document.createRange()
-            after.setStart(textNode, commandWithSpace.length)
+            after.setStart(textNode, text.length)
             after.collapse(true)
             sel.addRange(after)
           }
         } catch (err) {
           console.error("Insert command failed:", err)
-          document.execCommand("insertText", false, commandWithSpace)
-          setTimeout(() => {
-            highlightExistingCommands()
-          }, 0)
+          document.execCommand("insertText", false, text)
+          setTimeout(() => { highlightExistingCommands() }, 0)
         }
       } else {
-        document.execCommand("insertText", false, commandWithSpace)
-        setTimeout(() => {
-          highlightExistingCommands()
-        }, 0)
+        document.execCommand("insertText", false, text)
+        setTimeout(() => { highlightExistingCommands() }, 0)
       }
     }
+  }
 
-    // Ensure highlights are applied after insertion (CSS.highlights or fallback)
-    setTimeout(() => {
-      try {
-        highlightExistingCommands()
-      } catch (e) {
-        console.error("Error re-highlighting after insert:", e)
-      }
-    }, 0)
-
+  const cleanupAfterInsert = () => {
     targetRef.current = null
     selectionRangeRef.current = null
     contentEditableRangeRef.current = null
@@ -810,11 +829,38 @@ const CommandPaletteUI = () => {
     setIsVisible(false)
   }
 
+  const handleCommandSelectInternal = (command: string) => {
+    const label = command.replace(/^\//, "")
+    const cmd = storedCommands.find(p => p.label === label)
+
+    if (cmd) {
+      const vars = extractVariables(cmd.template || "")
+      if (vars.length > 0) {
+        setVarModalLabel(label)
+        setVarModalTemplate(cmd.template || "")
+        setVarModalVars(vars)
+        setShowVarModal(true)
+        setIsVisible(false)
+        return
+      }
+    }
+
+    insertIntoInput(`${label} `)
+    cleanupAfterInsert()
+  }
+
+  const handleVarSubmit = (values: Record<string, string>) => {
+    const varString = varModalVars.map(v => `${v}="${values[v] || ""}"`).join(" ")
+    insertIntoInput(`${varModalLabel} ${varString} `)
+    setShowVarModal(false)
+    cleanupAfterInsert()
+  }
+
   return (
     <div ref={paletteRef}>
       {isVisible && (
         <>
-          <div className="plasmo-fixed plasmo-inset-0 plasmo-z-[9999] plasmo-backdrop-blur-sm" onClick={() => setIsVisible(false)} />
+          <div className="plasmo-fixed plasmo-inset-0 plasmo-z-[9999]" style={{ background: "rgba(0,0,0,0.6)", backdropFilter: "blur(8px)" }} onClick={() => setIsVisible(false)} />
           <div className="plasmo-fixed plasmo-inset-0 plasmo-z-[10000] plasmo-flex plasmo-items-center plasmo-justify-center plasmo-pointer-events-none">
             <div className="plasmo-pointer-events-auto" onMouseDown={(e) => e.stopPropagation()}>
               {hasLoadedCommands && (
@@ -832,6 +878,17 @@ const CommandPaletteUI = () => {
             </div>
           </div>
         </>
+      )}
+
+      {showVarModal && (
+        <VariableModal
+          label={varModalLabel}
+          variables={varModalVars}
+          template={varModalTemplate}
+          theme={theme}
+          onSubmit={handleVarSubmit}
+          onClose={() => { setShowVarModal(false); cleanupAfterInsert() }}
+        />
       )}
     </div>
   )

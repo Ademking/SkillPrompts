@@ -65,7 +65,7 @@ export function FormModal({
     return (
         <div
             className="plasmo-fixed plasmo-inset-0 plasmo-z-50 plasmo-flex plasmo-items-center plasmo-justify-center plasmo-p-4 modal-overlay"
-            style={{ background: "rgba(0,0,0,0.6)", backdropFilter: "blur(12px)" }}
+            style={{ background: "rgba(0,0,0,0.6)", backdropFilter: "blur(8px)" }}
             onClick={handleBackdropClick}
             onKeyDown={handleKeyDown}
         >
