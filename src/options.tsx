@@ -85,7 +85,7 @@ function OptionsIndex() {
 
         load()
 
-        storage.watch({
+        const unwatch = storage.watch({
             [PROMPTS_STORAGE_KEY]: (change: { newValue?: Prompt[] }) => {
                 setPrompts(Array.isArray(change.newValue) ? change.newValue : [])
             },
@@ -99,17 +99,9 @@ function OptionsIndex() {
 
         return () => {
             cancelled = true
+            unwatch?.()
         }
     }, [storage])
-
-    useEffect(() => {
-        if (!hasLoadedStorage) return
-        try {
-            storage.set(PROMPTS_STORAGE_KEY, prompts)
-        } catch (err) {
-            // ignore
-        }
-    }, [prompts, storage, hasLoadedStorage])
 
     const filteredPrompts = useMemo(() => {
         const q = searchTerm.toLowerCase().trim()
@@ -142,12 +134,15 @@ function OptionsIndex() {
 
     const closeForm = () => { setShowForm(false); setEditingId(null) }
 
-    const handleSave = (data: Prompt) => {
+    const handleSave = async (data: Prompt) => {
+        let updated: Prompt[]
         if (editingId) {
-            setPrompts(p => p.map(x => x.id === editingId ? { ...x, ...data } : x))
+            updated = prompts.map(x => x.id === editingId ? { ...x, ...data } : x)
         } else {
-            setPrompts(p => [...p, { ...data, id: String(Date.now()) }])
+            updated = [...prompts, { ...data, id: String(Date.now()) }]
         }
+        setPrompts(updated)
+        await storage.set(PROMPTS_STORAGE_KEY, updated)
         closeForm()
     }
 
@@ -156,23 +151,26 @@ function OptionsIndex() {
         if (p) setPendingDelete(p)
     }
 
-    const confirmDelete = () => {
-        if (pendingDelete) {
-            setPrompts(p => p.filter(x => x.id !== pendingDelete.id))
-            setPendingDelete(null)
-        }
+    const confirmDelete = async () => {
+        if (!pendingDelete) return
+        const updated = prompts.filter(x => x.id !== pendingDelete.id)
+        setPrompts(updated)
+        await storage.set(PROMPTS_STORAGE_KEY, updated)
+        setPendingDelete(null)
     }
 
     const existingLabels = useMemo(() => new Set(prompts.map(p => p.label.toLowerCase())), [prompts])
 
-    const handleImportFromLibrary = (lib: LibraryPrompt) => {
+    const handleImportFromLibrary = async (lib: LibraryPrompt) => {
         const newPrompt: Prompt = {
             id: String(Date.now()),
             label: lib.label,
             description: lib.description,
             template: lib.prompt,
         }
-        setPrompts(p => [...p, newPrompt])
+        const updated = [...prompts, newPrompt]
+        setPrompts(updated)
+        await storage.set(PROMPTS_STORAGE_KEY, updated)
         showToast(`Imported "${lib.label}"`)
     }
 
@@ -487,9 +485,8 @@ function OptionsIndex() {
                 ) : (
                     <div className="plasmo-flex plasmo-flex-col plasmo-border plasmo-border-[var(--border)] divide-y divide-[var(--border)] plasmo-bg-[var(--card)]">
                         {filteredPrompts.map((p, index) => (
-                            <>
+                            <React.Fragment key={p.id}>
                                 <PromptRow
-                                    key={p.id}
                                     prompt={p}
                                     onCopy={handleCopy}
                                     onEdit={openForm}
@@ -499,10 +496,9 @@ function OptionsIndex() {
                                     usage={usage[p.label]}
                                 />
                                 {
-                                    // add hr between items except the last one (already have border)
                                     index !== filteredPrompts.length - 1 && <hr className="plasmo-border-t plasmo-border-[var(--border)] plasmo-m-0" />
                                 }
-                            </>
+                            </React.Fragment>
                         ))}
                     </div>
                 )}

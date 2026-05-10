@@ -179,9 +179,6 @@ const CommandPaletteUI = () => {
     const supportsHighlights = Boolean((window as any).CSS && (CSS as any).highlights)
 
     try {
-      // diagnostics
-      console.debug("highlightExistingCommands: supportsHighlights=", supportsHighlights, "storedCommands=", storedCommands)
-
       if (storedCommands.length === 0) {
         if (supportsHighlights) {
           (CSS as any).highlights.delete("command-insert")
@@ -194,7 +191,7 @@ const CommandPaletteUI = () => {
       }
 
       const contentEditables = getAllContentEditables()
-      console.debug("highlightExistingCommands: contentEditables found=", contentEditables.length)
+
 
       // Build ranges for CSS.highlights if available
       if (supportsHighlights) {
@@ -287,7 +284,7 @@ const CommandPaletteUI = () => {
               matches.push({ node: textNode, start: vMatch.index, end: vMatch.index + vMatch[0].length, type: 'var' })
             }
           }
-          console.debug(`highlightExistingCommands fallback: ${matches.length} matches found in ${(element as any).tagName || 'unknown'}`)
+
 
 
           // Apply wrapping: rebuild each text node with matches
@@ -358,7 +355,7 @@ const CommandPaletteUI = () => {
             parent.removeChild(textNode)
           }
 
-          if (matches.length > 0) console.debug(`fallback wrapped ${byNode.size} node(s) with ${matches.length} span(s)`)
+
         })
       } finally {
         ignoreMutationsRef.current = false
@@ -427,7 +424,7 @@ const CommandPaletteUI = () => {
     }
 
     const contentEditables = getAllContentEditables()
-    console.debug("replaceCommandsWithPrompts: contentEditables found=", contentEditables.length)
+
 
     contentEditables.forEach((element) => {
       // Unwrap fallback spans so command+variable text isn't split by highlight wrappers
@@ -459,25 +456,20 @@ const CommandPaletteUI = () => {
   // Expose debug helper to window for manual testing
   useEffect(() => {
     (window as any).__debugHighlight = () => {
-      console.log("=== MANUAL HIGHLIGHT DEBUG ===")
-      console.log("Stored commands:", storedCommands)
       const editables = getAllContentEditables()
-      console.log("Contenteditable elements found:", editables.length)
       for (let i = 0; i < editables.length; i++) {
         const el = editables[i]
-        console.log(`  [${i}] ${(el as any).tagName}: "${(el.textContent || '').slice(0, 50)}"`)
       }
       const spans = document.querySelectorAll("span.command-insert-fallback")
-      console.log("Existing fallback spans:", spans.length)
       highlightExistingCommands()
       setTimeout(() => {
         const spansAfter = document.querySelectorAll("span.command-insert-fallback")
-        console.log("Fallback spans after highlight:", spansAfter.length)
+
         for (let i = 0; i < spansAfter.length; i++) {
           const s = spansAfter[i]
-          console.log(`  [${i}] "${s.textContent}" class="${s.className}" style="${s.getAttribute('style')}"`)
+
           const computed = window.getComputedStyle(s)
-          console.log(`      computed bg=${computed.backgroundColor} color=${computed.color}`)
+
         }
       }, 100)
     }
