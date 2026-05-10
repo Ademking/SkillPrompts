@@ -27,6 +27,7 @@ export const getStyle = (): HTMLStyleElement => {
 }
 
 const PROMPTS_STORAGE_KEY = "skillprompts_prompts"
+const ENABLED_STORAGE_KEY = "skillprompts_enabled"
 
 type StoredPrompt = {
   id: string
@@ -107,6 +108,7 @@ const CommandPaletteUI = () => {
   }
   const [storedCommands, setStoredCommands] = useState<StoredPrompt[]>([])
   const [hasLoadedCommands, setHasLoadedCommands] = useState(false)
+  const [isEnabled, setIsEnabled] = useState(true)
 
   // Helper: find all elements with contenteditable (any value except "false"), including inside shadow roots
   const getAllContentEditables = () => {
@@ -130,6 +132,8 @@ const CommandPaletteUI = () => {
   }
 
   const highlightExistingCommands = () => {
+    if (!isEnabled) return
+
     const supportsHighlights = Boolean((window as any).CSS && (CSS as any).highlights)
 
     try {
@@ -519,9 +523,12 @@ const CommandPaletteUI = () => {
           }
         }
 
+        const savedEnabled = await storage.get<boolean>(ENABLED_STORAGE_KEY)
+
         if (!cancelled) {
           setStoredCommands(nextCommands)
           setHasLoadedCommands(true)
+          if (savedEnabled !== undefined) setIsEnabled(savedEnabled)
         }
       } catch (err) {
         if (!cancelled) {
@@ -539,6 +546,9 @@ const CommandPaletteUI = () => {
         setStoredCommands(nextCommands)
         setHasLoadedCommands(true)
         setTimeout(() => highlightRef.current(), 0)
+      },
+      [ENABLED_STORAGE_KEY]: (change: { newValue?: boolean }) => {
+        setIsEnabled(change.newValue !== false)
       }
     })
 
@@ -555,6 +565,8 @@ const CommandPaletteUI = () => {
 
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
+      if (!isEnabled) return
+
       const target = event.target as HTMLElement
 
       if (paletteRef.current?.contains(target)) {
@@ -625,12 +637,14 @@ const CommandPaletteUI = () => {
     }
 
     const handleBeforeInput = (event: InputEvent) => {
+      if (!isEnabled) return
       if (event.data === "/") {
         event.preventDefault()
       }
     }
 
     const handleKeyUp = (event: KeyboardEvent) => {
+      if (!isEnabled) return
       if (event.key === "/") {
         event.preventDefault()
         event.stopPropagation()
@@ -709,7 +723,7 @@ const CommandPaletteUI = () => {
         ; (buttonElement as HTMLElement).removeEventListener("click", handleSendAction)
       })
     }
-  }, [isVisible])
+  }, [isVisible, isEnabled])
 
   const handleCommandSelect = (command: string) => {
     // keep previous handler below; placeholder to satisfy linter if needed

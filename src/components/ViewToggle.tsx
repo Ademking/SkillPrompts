@@ -8,7 +8,7 @@ export function ViewToggle({ viewMode, onToggle }: { viewMode: "grid" | "list"; 
             aria-checked={viewMode === "grid"}
             aria-label={`Switch to ${viewMode === "grid" ? "list" : "grid"} view`}
             className="
-        plasmo-relative plasmo-flex plasmo-h-9 plasmo-w-[72px]
+        plasmo-relative plasmo-flex plasmo-h-[41.5px] plasmo-w-[72px]
         plasmo-items-center 
         plasmo-border plasmo-border-[var(--border)]
         

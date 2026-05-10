@@ -15,10 +15,12 @@ import { Icons } from "~components/Icons"
 const PROMPTS_STORAGE_KEY = "skillprompts_prompts"
 const THEME_STORAGE_KEY = "skillprompts_theme"
 const VIEW_STORAGE_KEY = "skillprompts_view"
+const ENABLED_STORAGE_KEY = "skillprompts_enabled"
 
 function OptionsIndex() {
     const storage = useMemo(() => new Storage({ area: "local" }), [])
     const [prompts, setPrompts] = useState<Prompt[]>([])
+    const [isEnabled, setIsEnabled] = useState(true)
     const [isDark, setIsDark] = useState(true)
     const [hasLoadedStorage, setHasLoadedStorage] = useState(false)
     const [showForm, setShowForm] = useState(false)
@@ -55,12 +57,14 @@ function OptionsIndex() {
                 const savedTheme = await storage.get<"light" | "dark">(THEME_STORAGE_KEY)
                 const legacyTheme = window.localStorage.getItem(THEME_STORAGE_KEY)
                 const savedView = await storage.get<"grid" | "list">(VIEW_STORAGE_KEY)
+                const savedEnabled = await storage.get<boolean>(ENABLED_STORAGE_KEY)
 
                 if (!cancelled) {
                     setPrompts(nextPrompts)
                     const storedPreference = savedTheme ?? legacyTheme
                     setIsDark(storedPreference ? storedPreference === "dark" : true)
                     if (savedView) setViewMode(savedView)
+                    if (savedEnabled !== undefined) setIsEnabled(savedEnabled)
                     setHasLoadedStorage(true)
                 }
             } catch (err) {
@@ -280,7 +284,7 @@ function OptionsIndex() {
                     <div className="plasmo-flex plasmo-items-center plasmo-gap-3.5">
                         <Logo width={42} height={42} color={isDark ? "var(--accent)" : "#148EFF"} />
                         <div className="plasmo-flex plasmo-flex-col plasmo-items-start plasmo-leading-tight">
-                            <span className="plasmo-text-[22px] plasmo-font-semibold plasmo-tracking-tight" style={{ color: isDark ? "#FFFFFF" : "#0F1117" }}>
+                            <span className="plasmo-text-[26px] plasmo-tracking-tighter" style={{ color: isDark ? "#FFFFFF" : "#0F1117" }}>
                                 SkillPrompts
                             </span>
                             <span className="plasmo-text-[11px] plasmo-text-[var(--muted)]">v1.0</span>
@@ -288,6 +292,7 @@ function OptionsIndex() {
                     </div>
 
                     <div className="plasmo-flex plasmo-items-center plasmo-gap-2">
+
                         <button
                             onClick={() => openForm()}
                             className="plasmo-inline-flex plasmo-items-center plasmo-gap-2 plasmo-h-9 plasmo-px-4  plasmo-bg-[var(--accent)] plasmo-text-white plasmo-text-[13px] plasmo-font-light plasmo-transition-all hover:plasmo-opacity-90 active:plasmo-scale-[0.97]"
@@ -300,7 +305,7 @@ function OptionsIndex() {
                         >
                             <Icons.folder /> Explore Skills
                         </button>
-                        <ViewToggle viewMode={viewMode} onToggle={toggleView} />
+
                         <button
                             onClick={() => { const next = !isDark; setIsDark(next); storage.set(THEME_STORAGE_KEY, next ? "dark" : "light") }}
                             className="plasmo-flex plasmo-h-9 plasmo-w-9 plasmo-items-center plasmo-justify-center  plasmo-border plasmo-border-[var(--border)] plasmo-text-[var(--muted)] plasmo-transition-colors hover:plasmo-bg-[var(--hover)] hover:plasmo-text-[var(--text)]"
@@ -308,22 +313,48 @@ function OptionsIndex() {
                         >
                             {isDark ? <Icons.sun /> : <Icons.moon />}
                         </button>
+                        <button
+                            onClick={() => {
+                                const next = !isEnabled;
+                                setIsEnabled(next);
+                                storage.set(ENABLED_STORAGE_KEY, next);
+                            }}
+                            className={`plasmo-relative plasmo-flex plasmo-h-9 plasmo-w-[60px] plasmo-items-center plasmo-justify-center plasmo-gap-1.5 plasmo-text-[11px] plasmo-font-bold plasmo-tracking-[0.15em] plasmo-uppercase plasmo-transition-all plasmo-duration-150 plasmo-select-none plasmo-outline-none plasmo-border
+    ${isEnabled
+                                    ? "plasmo-border-blue-500 plasmo-text-blue-500"
+                                    : "plasmo-border-[var(--border)] plasmo-text-zinc-500"
+                                }
+    hover:plasmo-opacity-70 active:plasmo-translate-y-px`}
+                            aria-label={`Toggle extension ${isEnabled ? "off" : "on"}`}
+                        >
+                            <span
+                                className={`plasmo-w-1 plasmo-h-1 plasmo-rounded-full plasmo-transition-all plasmo-duration-150
+      ${isEnabled ? "plasmo-bg-blue-500" : "plasmo-bg-zinc-600"}`}
+                            />
+                            {isEnabled ? "ON" : "OFF"}
+                        </button>
 
                     </div>
                 </header>
 
+
                 {/* ── Search ── */}
                 {prompts.length > 0 && (
-                    <div className="plasmo-relative">
-                        <div className="plasmo-absolute plasmo-left-4 plasmo-top-1/2 plasmo--translate-y-1/2 plasmo-text-[var(--dim)] plasmo-pointer-events-none">
-                            <Icons.search />
+                    <div className="plasmo-flex plasmo-items-center plasmo-gap-3 plasmo-w-full">
+                        <ViewToggle viewMode={viewMode} onToggle={toggleView} />
+
+                        <div className="plasmo-relative plasmo-flex-1">
+                            <div className="plasmo-absolute plasmo-left-4 plasmo-top-1/2 plasmo--translate-y-1/2 plasmo-text-[var(--dim)] plasmo-pointer-events-none">
+                                <Icons.search />
+                            </div>
+
+                            <input
+                                value={searchTerm}
+                                onChange={e => setSearchTerm(e.target.value)}
+                                placeholder="Search prompts..."
+                                className={`${inputCls} plasmo-w-full plasmo-pl-10`}
+                            />
                         </div>
-                        <input
-                            value={searchTerm}
-                            onChange={e => setSearchTerm(e.target.value)}
-                            placeholder="Search prompts..."
-                            className={`${inputCls} plasmo-pl-10`}
-                        />
                     </div>
                 )}
 
