@@ -327,6 +327,14 @@ function OptionsIndex() {
                                 <p className="plasmo-text-[12.5px] plasmo-text-[var(--muted)] plasmo-text-center plasmo-leading-relaxed">
                                     A Chrome extension to manage and use AI skill prompts for ChatGPT. Create, organize, and quickly insert prompts with variables.
                                 </p>
+                                <p className="plasmo-text-[12.5px] plasmo-text-[var(--muted)] plasmo-text-center plasmo-leading-relaxed">
+                                    Don't forget to Give it a star on GitHub! <a href="https://github.com/Ademking/SkillPrompts" target="_blank" className="plasmo-text-[var(--accent)] hover:plasmo-underline">
+                                        https://github.com/Ademking/SkillPrompts
+                                    </a>
+                                </p>
+                                <p className="plasmo-text-[12.5px] plasmo-text-[var(--muted)] plasmo-text-center plasmo-leading-relaxed">
+                                    Made with ❤️ by <a href="#" target="_blank" className="plasmo-text-amber-400 hover:plasmo-underline">Adem Kouki</a> for everyone who loves using AI prompts.
+                                </p>
                             </div>
                             <div className="plasmo-flex plasmo-items-center plasmo-justify-center plasmo-px-6 plasmo-py-3 plasmo-border-t plasmo-border-[var(--border)] plasmo-bg-[var(--hover)]">
                                 <button
@@ -339,7 +347,8 @@ function OptionsIndex() {
                         </div>
                     </div>
                 </div>
-            )}
+            )
+            }
 
             <div className="plasmo-mx-auto plasmo-px-6 plasmo-py-4 plasmo-flex plasmo-flex-col plasmo-gap-6">
 
@@ -499,7 +508,7 @@ function OptionsIndex() {
                 )}
 
             </div>
-        </div>
+        </div >
     )
 }
 

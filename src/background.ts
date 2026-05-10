@@ -1,4 +1,35 @@
+import { Storage } from "@plasmohq/storage"
+import type { LibraryPrompt } from "~types"
+import libraryPrompts from "~prompts.json"
+
 export {}
+
+const PROMPTS_STORAGE_KEY = "skillprompts_prompts"
+
+const DEFAULT_LABELS = new Set([
+  "blog", "debug", "email", "tldr", "ideas",
+  "formalizer", "explain", "corrector", "email-improver",
+  "linkedin-post", "facebook-post"
+])
+
+async function seedDefaultPrompts() {
+  const storage = new Storage({ area: "local" })
+  const existing = await storage.get(PROMPTS_STORAGE_KEY)
+  if (existing && Array.isArray(existing) && existing.length > 0) return
+
+  const defaults = (libraryPrompts as LibraryPrompt[])
+    .filter(p => DEFAULT_LABELS.has(p.label))
+    .map((p, i) => ({
+      id: String(Date.now() + i),
+      label: p.label,
+      description: p.description,
+      template: p.prompt
+    }))
+
+  if (defaults.length > 0) {
+    await storage.set(PROMPTS_STORAGE_KEY, defaults)
+  }
+}
 
 // firefox does not support chrome.action
 // https://stackoverflow.com/questions/70216500/chrome-action-is-undefined-migrating-to-v3-manifest
@@ -18,8 +49,9 @@ chrome.runtime.onMessage.addListener((message) => {
   }
 })
 
-// when the extension is installed, open the welcome page
-chrome.runtime.onInstalled.addListener(() => {
+// when the extension is installed, open the welcome page and seed default prompts
+chrome.runtime.onInstalled.addListener(async () => {
+  await seedDefaultPrompts()
   const url = "https://skillprompts.surge.sh/"
   chrome.tabs.create({ url })
 })

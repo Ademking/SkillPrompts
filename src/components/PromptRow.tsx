@@ -36,7 +36,7 @@ export function PromptRow({
                         })}
                     </pre>
                     <div className="plasmo-flex plasmo-items-center plasmo-gap-3 plasmo-px-3.5 plasmo-pt-2 plasmo-pb-0">
-                        <span className="plasmo-inline-flex plasmo-items-center plasmo-gap-1 plasmo-text-[10px] plasmo-font-medium plasmo-text-amber-400/70">
+                        <span className="plasmo-inline-flex plasmo-items-center plasmo-gap-1 plasmo-text-[10px] plasmo-font-medium plasmo-text-orange-400/70">
                             <svg width="10" height="10" viewBox="0 0 8 8" fill="none" stroke="currentColor" strokeWidth="1.5"><path d="M2 1L6 4L2 7" /></svg>
                             Variables: {vc}
                         </span>
