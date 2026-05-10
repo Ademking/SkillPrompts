@@ -28,8 +28,24 @@
   },
   "manifest": {
     "host_permissions": [
+      "https://chatgpt.com/*",
       "https://chat.openai.com/*",
-      "https://chatgpt.com/*"
+      "https://claude.ai/*",
+      "https://gemini.google.com/*",
+      "https://copilot.microsoft.com/*",
+      "https://huggingface.co/chat/*",
+      "https://chat.mistral.ai/*",
+      "https://poe.com/*",
+      "https://www.perplexity.ai/*",
+      "https://chat.deepseek.com/*",
+      "https://kimi.com/*",
+      "https://*.kimi.com/*",
+      "https://m365.cloud.microsoft/*",
+      "https://v0.app/*",
+      "https://github.com/copilot/*",
+      "https://grok.com/*",
+      "https://cursor.com/agents*",
+      "https://cursor.com/*/agents*"
     ]
   }
 }

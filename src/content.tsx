@@ -9,7 +9,26 @@ import type { PlasmoCSConfig } from "plasmo"
 const styleElement = document.createElement("style")
 
 export const config: PlasmoCSConfig = {
-  matches: ["https://chat.openai.com/*", "https://chatgpt.com/*"]
+  matches: [
+    "https://chatgpt.com/*",
+    "https://chat.openai.com/*",
+    "https://claude.ai/*",
+    "https://gemini.google.com/*",
+    "https://copilot.microsoft.com/*",
+    "https://huggingface.co/chat/*",
+    "https://chat.mistral.ai/*",
+    "https://poe.com/*",
+    "https://www.perplexity.ai/*",
+    "https://chat.deepseek.com/*",
+    "https://kimi.com/*",
+    "https://*.kimi.com/*",
+    "https://m365.cloud.microsoft/*",
+    "https://v0.app/*",
+    "https://github.com/copilot/*",
+    "https://grok.com/*",
+    "https://cursor.com/agents*",
+    "https://cursor.com/*/agents*"
+  ]
 }
 
 export const getStyle = (): HTMLStyleElement => {
@@ -181,7 +200,7 @@ const CommandPaletteUI = () => {
       if (storedCommands.length === 0) {
         if (supportsHighlights) {
           (CSS as any).highlights.delete("command-insert")
-          ; (CSS as any).highlights.delete("var-insert")
+            ; (CSS as any).highlights.delete("var-insert")
         }
         highlightedRangesRef.current = []
         // unwrap any fallback spans
@@ -235,13 +254,13 @@ const CommandPaletteUI = () => {
           if (cmdRanges.length > 0) {
             highlightedRangesRef.current = cmdRanges
             const cmdHighlight = new Highlight(...cmdRanges)
-            ; (CSS as any).highlights.set("command-insert", cmdHighlight)
+              ; (CSS as any).highlights.set("command-insert", cmdHighlight)
           } else {
             ; (CSS as any).highlights.delete("command-insert")
           }
           if (varRanges.length > 0) {
             const varHighlight = new Highlight(...varRanges)
-            ; (CSS as any).highlights.set("var-insert", varHighlight)
+              ; (CSS as any).highlights.set("var-insert", varHighlight)
           } else {
             ; (CSS as any).highlights.delete("var-insert")
           }
