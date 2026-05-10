@@ -307,6 +307,8 @@ const CommandPaletteUI = () => {
 
   highlightRef.current = highlightExistingCommands
 
+  const replaceCommandsWithPromptsRef = useRef<() => void>(() => { })
+
   const replaceCommandsWithPrompts = () => {
     const expandCommand = (match: string, label: string): string => {
       const cmd = storedCommands.find(p => p.label === label)
@@ -337,7 +339,7 @@ const CommandPaletteUI = () => {
       let updatedText = text
       for (const cmd of storedCommands) {
         const escapedLabel = cmd.label.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")
-        const pattern = `\\/${escapedLabel}(?:\\s+\\w+="[^"]*")*\\s*`
+        const pattern = `\\/${escapedLabel}(?:\\s+\\w+="[^"]*")*(?!\\S)`
         const regex = new RegExp(pattern, "g")
         updatedText = updatedText.replace(regex, (match) => expandCommand(match, cmd.label))
       }
@@ -360,39 +362,27 @@ const CommandPaletteUI = () => {
     console.debug("replaceCommandsWithPrompts: contentEditables found=", contentEditables.length)
 
     contentEditables.forEach((element) => {
-      const walker = document.createTreeWalker(element, NodeFilter.SHOW_TEXT, null)
-      const nodesToReplace: { node: Text; replacements: { pattern: RegExp; cmd: StoredPrompt }[] }[] = []
+      // Unwrap fallback spans so command+variable text isn't split by highlight wrappers
+      element.querySelectorAll("span.command-insert-fallback").forEach((s) =>
+        s.replaceWith(document.createTextNode(s.textContent || ""))
+      )
 
-      let node
-      while ((node = walker.nextNode())) {
-        const textNode = node as Text
-        const text = textNode.nodeValue || ""
-        const replacements: { pattern: RegExp; cmd: StoredPrompt }[] = []
+      const fullText = element.textContent || ""
+      const processed = replaceText(fullText)
 
-        for (const cmd of storedCommands) {
-          const escapedLabel = cmd.label.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")
-          const pattern = new RegExp(`\\/${escapedLabel}(?:\\s+\\w+="[^"]*")*\\s*`)
-          if (pattern.test(text)) {
-            replacements.push({ pattern, cmd })
-          }
-        }
-
-        if (replacements.length > 0) {
-          nodesToReplace.push({ node: textNode, replacements })
-        }
+      if (processed !== fullText) {
+        // Use execCommand so ProseMirror intercepts and applies to internal state
+        const sel = window.getSelection()
+        const range = document.createRange()
+        range.selectNodeContents(element)
+        sel.removeAllRanges()
+        sel.addRange(range)
+        document.execCommand("insertText", false, processed)
       }
-
-      nodesToReplace.forEach(({ node, replacements }) => {
-        let newText = node.nodeValue || ""
-
-        for (const { pattern, cmd } of replacements) {
-          newText = newText.replace(pattern, (match) => expandCommand(match, cmd.label))
-        }
-
-        node.nodeValue = newText
-      })
     })
   }
+  replaceCommandsWithPromptsRef.current = replaceCommandsWithPrompts
+
   useEffect(() => {
     if (!hasLoadedCommands) return
     highlightExistingCommands()
@@ -613,7 +603,7 @@ const CommandPaletteUI = () => {
           target.isContentEditable ||
           target.tagName === "INPUT"
         ) {
-          replaceCommandsWithPrompts()
+          replaceCommandsWithPromptsRef.current()
         }
       }
 
@@ -713,7 +703,7 @@ const CommandPaletteUI = () => {
     }
 
     const handleSendAction = () => {
-      replaceCommandsWithPrompts()
+      replaceCommandsWithPromptsRef.current()
     }
 
     window.addEventListener("keydown", handleKeyDown, true)
@@ -863,7 +853,7 @@ const CommandPaletteUI = () => {
           <div className="plasmo-fixed plasmo-inset-0 plasmo-z-[9999]" style={{ background: "rgba(0,0,0,0.6)", backdropFilter: "blur(8px)" }} onClick={() => setIsVisible(false)} />
           <div className="plasmo-fixed plasmo-inset-0 plasmo-z-[10000] plasmo-flex plasmo-items-center plasmo-justify-center plasmo-pointer-events-none">
             <div className="plasmo-pointer-events-auto" onMouseDown={(e) => e.stopPropagation()}>
-              {hasLoadedCommands && (
+              {hasLoadedCommands ? (
                 <CommandPalette
                   position={{ x: 0, y: 0 }}
                   searchValue={inputValue}
@@ -874,6 +864,10 @@ const CommandPaletteUI = () => {
                   centered={true}
                   commands={storedCommands.map(p => ({ id: p.label, label: p.label, description: p.description || "", template: p.template }))}
                 />
+              ) : (
+                <div className={`plasmo-flex plasmo-items-center plasmo-justify-center plasmo-px-6 plasmo-py-4 plasmo-text-sm ${theme === "dark" ? "plasmo-text-neutral-400" : "plasmo-text-neutral-500"}`}>
+                  Loading commands...
+                </div>
               )}
             </div>
           </div>
