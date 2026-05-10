@@ -95,6 +95,29 @@ const CommandPaletteUI = () => {
   padding: 0 2px !important;
   box-shadow: 0 0 0 1px rgba(20, 142, 255, 0.25) inset !important;
 }
+
+::highlight(var-insert) {
+  background-color: rgba(245, 158, 11, 0.18);
+  color: #F59E0B;
+  text-decoration: underline 2px solid rgba(245, 158, 11, 0.7);
+  text-underline-offset: 3px;
+  text-shadow: 0 0 6px rgba(245, 158, 11, 0.35);
+  border-radius: 4px;
+  padding: 0 2px;
+  box-shadow: 0 0 0 1px rgba(245, 158, 11, 0.25) inset;
+  transition: all 0.2s ease-in-out;
+}
+
+.var-insert-fallback {
+  background-color: rgba(245, 158, 11, 0.18) !important;
+  color: #F59E0B !important;
+  text-decoration: underline 2px solid rgba(245, 158, 11, 0.7) !important;
+  text-underline-offset: 3px !important;
+  text-shadow: 0 0 6px rgba(245, 158, 11, 0.35) !important;
+  border-radius: 4px !important;
+  padding: 0 2px !important;
+  box-shadow: 0 0 0 1px rgba(245, 158, 11, 0.25) inset !important;
+}
     `
     document.head.appendChild(style)
 
@@ -155,10 +178,13 @@ const CommandPaletteUI = () => {
       console.debug("highlightExistingCommands: supportsHighlights=", supportsHighlights, "storedCommands=", storedCommands)
 
       if (storedCommands.length === 0) {
-        if (supportsHighlights) (CSS as any).highlights.delete("command-insert")
+        if (supportsHighlights) {
+          (CSS as any).highlights.delete("command-insert")
+          ; (CSS as any).highlights.delete("var-insert")
+        }
         highlightedRangesRef.current = []
         // unwrap any fallback spans
-        document.querySelectorAll("span.command-insert-fallback").forEach((s) => s.replaceWith(document.createTextNode(s.textContent || "")))
+        document.querySelectorAll("span.command-insert-fallback, span.var-insert-fallback").forEach((s) => s.replaceWith(document.createTextNode(s.textContent || "")))
         return
       }
 
@@ -167,7 +193,8 @@ const CommandPaletteUI = () => {
 
       // Build ranges for CSS.highlights if available
       if (supportsHighlights) {
-        const ranges: Range[] = []
+        const cmdRanges: Range[] = []
+        const varRanges: Range[] = []
 
         contentEditables.forEach((element) => {
           const walker = document.createTreeWalker(element, NodeFilter.SHOW_TEXT, null)
@@ -185,41 +212,53 @@ const CommandPaletteUI = () => {
                 const range = document.createRange()
                 range.setStart(textNode, idx)
                 range.setEnd(textNode, idx + template.length)
-                ranges.push(range)
+                cmdRanges.push(range)
 
                 startIdx = idx + template.length
                 idx = text.indexOf(template, startIdx)
               }
             }
-          }
 
+            const varRegex = /(\w+)="([^"]*)"/g
+            let vMatch
+            while ((vMatch = varRegex.exec(text)) !== null) {
+              const range = document.createRange()
+              range.setStart(textNode, vMatch.index)
+              range.setEnd(textNode, vMatch.index + vMatch[0].length)
+              varRanges.push(range)
+            }
+          }
         })
 
-        if (ranges.length > 0) {
-          highlightedRangesRef.current = ranges
-          try {
-            const highlight = new Highlight(...ranges)
-              ; (CSS as any).highlights.set("command-insert", highlight)
-            return
-          } catch (err) {
-            console.error("Highlight API failed, falling back to span wrapper:", err)
+        try {
+          if (cmdRanges.length > 0) {
+            highlightedRangesRef.current = cmdRanges
+            const cmdHighlight = new Highlight(...cmdRanges)
+            ; (CSS as any).highlights.set("command-insert", cmdHighlight)
+          } else {
+            ; (CSS as any).highlights.delete("command-insert")
           }
+          if (varRanges.length > 0) {
+            const varHighlight = new Highlight(...varRanges)
+            ; (CSS as any).highlights.set("var-insert", varHighlight)
+          } else {
+            ; (CSS as any).highlights.delete("var-insert")
+          }
+          return
+        } catch (err) {
+          console.error("Highlight API failed, falling back to span wrapper:", err)
         }
-
-        // No matches found — clear any stale CSS highlights
-        ; (CSS as any).highlights.delete("command-insert")
-        highlightedRangesRef.current = []
       }
 
-      // Fallback: wrap matched tokens in span.command-insert-fallback
+      // Fallback: wrap matched tokens in span.command-insert-fallback / span.var-insert-fallback
       try {
         ignoreMutationsRef.current = true
         contentEditables.forEach((element: Element) => {
           // unwrap existing fallback spans first
-          element.querySelectorAll("span.command-insert-fallback").forEach((s) => s.replaceWith(document.createTextNode(s.textContent || "")))
+          element.querySelectorAll("span.command-insert-fallback, span.var-insert-fallback").forEach((s) => s.replaceWith(document.createTextNode(s.textContent || "")))
 
-          // Collect all matches: {textNode, startIdx, endIdx, label}
-          const matches: Array<{ node: Text, start: number, end: number, label: string }> = []
+          // Collect all matches: {textNode, startIdx, endIdx, type}
+          const matches: Array<{ node: Text, start: number, end: number, type: 'command' | 'var' }> = []
           const walker = document.createTreeWalker(element as Node, NodeFilter.SHOW_TEXT, null)
           let walkerNode
           while ((walkerNode = walker.nextNode())) {
@@ -231,20 +270,26 @@ const CommandPaletteUI = () => {
               let startIdx = 0
               let idx = text.indexOf(template, startIdx)
               while (idx !== -1) {
-                matches.push({ node: textNode, start: idx, end: idx + template.length, label: cmd.label })
+                matches.push({ node: textNode, start: idx, end: idx + template.length, type: 'command' })
                 startIdx = idx + template.length
                 idx = text.indexOf(template, startIdx)
               }
+            }
+
+            const varRegex = /(\w+)="([^"]*)"/g
+            let vMatch
+            while ((vMatch = varRegex.exec(text)) !== null) {
+              matches.push({ node: textNode, start: vMatch.index, end: vMatch.index + vMatch[0].length, type: 'var' })
             }
           }
           console.debug(`highlightExistingCommands fallback: ${matches.length} matches found in ${(element as any).tagName || 'unknown'}`)
 
 
           // Apply wrapping: rebuild each text node with matches
-          const byNode = new Map<Text, Array<{ start: number, end: number }>>()
+          const byNode = new Map<Text, Array<{ start: number, end: number, type: 'command' | 'var' }>>()
           for (const match of matches) {
             if (!byNode.has(match.node)) byNode.set(match.node, [])
-            byNode.get(match.node)!.push({ start: match.start, end: match.end })
+            byNode.get(match.node)!.push({ start: match.start, end: match.end, type: match.type })
           }
 
           for (const [textNode, nodeMatches] of byNode) {
@@ -252,49 +297,59 @@ const CommandPaletteUI = () => {
             if (!parent) continue
 
             const fullText = textNode.nodeValue || ""
-            const sortedMatches = nodeMatches.sort((a, b) => a.start - b.start) // forward order for building
+            const sortedMatches = nodeMatches.sort((a, b) => a.start - b.start)
 
-            // Build fragments: [{type:'text'|'span', content, start?, end?}]
-            const fragments: Array<{ type: string, content: string, start?: number, end?: number }> = []
+            // Build fragments: [{type: 'text'|'command'|'var', content}]
+            const fragments: Array<{ type: string, content: string }> = []
             let lastIdx = 0
 
             for (const match of sortedMatches) {
               if (match.start > lastIdx) {
                 fragments.push({ type: 'text', content: fullText.slice(lastIdx, match.start) })
               }
-              fragments.push({ type: 'span', content: fullText.slice(match.start, match.end), start: match.start, end: match.end })
+              fragments.push({ type: match.type, content: fullText.slice(match.start, match.end) })
               lastIdx = match.end
             }
 
-            // Add remaining text
             if (lastIdx < fullText.length) {
               fragments.push({ type: 'text', content: fullText.slice(lastIdx) })
             }
 
-            // Build new nodes and insert before old textNode
             for (const frag of fragments) {
               if (frag.type === 'text' && frag.content) {
                 parent.insertBefore(document.createTextNode(frag.content), textNode)
-              } else if (frag.type === 'span') {
+              } else if (frag.type === 'command' || frag.type === 'var') {
+                const isVar = frag.type === 'var'
                 const span = document.createElement("span")
-                span.className = "command-insert-fallback"
+                span.className = isVar ? "var-insert-fallback" : "command-insert-fallback"
                 span.textContent = frag.content
-                // Apply inline styles as backup (in case CSS class doesn't work in shadow DOM)
-                span.style.backgroundColor = "rgba(20, 142, 255, 0.18)"
-                span.style.color = "#148EFF"
-                span.style.textDecoration = "underline 2px solid rgba(20, 142, 255, 0.7)"
-                span.style.textDecorationColor = "rgba(20, 142, 255, 0.7)"
-                span.style.textDecorationThickness = "2px"
-                span.style.textUnderlineOffset = "3px"
-                span.style.textShadow = "0 0 6px rgba(20, 142, 255, 0.35)"
-                span.style.borderRadius = "4px"
-                span.style.padding = "0 2px"
-                span.style.boxShadow = "0 0 0 1px rgba(20, 142, 255, 0.25) inset"
+                if (isVar) {
+                  span.style.backgroundColor = "rgba(245, 158, 11, 0.18)"
+                  span.style.color = "#F59E0B"
+                  span.style.textDecoration = "underline 2px solid rgba(245, 158, 11, 0.7)"
+                  span.style.textDecorationColor = "rgba(245, 158, 11, 0.7)"
+                  span.style.textDecorationThickness = "2px"
+                  span.style.textUnderlineOffset = "3px"
+                  span.style.textShadow = "0 0 6px rgba(245, 158, 11, 0.35)"
+                  span.style.borderRadius = "4px"
+                  span.style.padding = "0 2px"
+                  span.style.boxShadow = "0 0 0 1px rgba(245, 158, 11, 0.25) inset"
+                } else {
+                  span.style.backgroundColor = "rgba(20, 142, 255, 0.18)"
+                  span.style.color = "#148EFF"
+                  span.style.textDecoration = "underline 2px solid rgba(20, 142, 255, 0.7)"
+                  span.style.textDecorationColor = "rgba(20, 142, 255, 0.7)"
+                  span.style.textDecorationThickness = "2px"
+                  span.style.textUnderlineOffset = "3px"
+                  span.style.textShadow = "0 0 6px rgba(20, 142, 255, 0.35)"
+                  span.style.borderRadius = "4px"
+                  span.style.padding = "0 2px"
+                  span.style.boxShadow = "0 0 0 1px rgba(20, 142, 255, 0.25) inset"
+                }
                 parent.insertBefore(span, textNode)
               }
             }
 
-            // Remove old text node
             parent.removeChild(textNode)
           }
 
