@@ -10,22 +10,13 @@ interface Command {
 }
 
 function extractVarCount(template: string): number {
-  const matches = template.match(/\{\{\s*\w+\s*\}\}/g)
-  if (!matches) return 0
-  const names = matches.map(m => m.replace(/\{\{\s*/, '').replace(/\s*\}\}/, ''))
-  return new Set(names).size
+    const matches = template.match(/\{\{\s*\w+\s*\}\}/g)
+    if (!matches) return 0
+    const names = matches.map(m => m.replace(/\{\{\s*/, '').replace(/\s*\}\}/, ''))
+    return new Set(names).size
 }
 
-const COMMANDS: Command[] = [
-    { id: "summarize", label: "Summarize", description: "Summarize the text", template: "Summarize the following text:" },
-    { id: "explain", label: "Explain", description: "Simplify and explain", template: "Explain the following in simple terms:" },
-    { id: "improve", label: "Improve Writing", description: "Fix grammar and style", template: "Improve the grammar and style of the following text:" },
-    { id: "translate", label: "Translate", description: "Translate to English", template: "Translate the following text to English:" },
-    { id: "code-review", label: "Code Review", description: "Review and improve code", template: "Review the following code and suggest improvements:" },
-    { id: "debug", label: "Debug", description: "Find and fix issues", template: "Help me debug the following code:" },
-    { id: "generate-test", label: "Generate Tests", description: "Create unit tests", template: "Generate unit tests for the following code:" },
-    { id: "document", label: "Document", description: "Add documentation", template: "Add documentation and comments to the following code:" }
-]
+const COMMANDS: Command[] = []
 
 interface Props {
     position: { x: number; y: number }
