@@ -1,8 +1,16 @@
 import type { Prompt } from "~types"
 import { Icons } from "~components/Icons"
 
+function varCount(template: string): number {
+    const matches = template.match(/\{\{\s*\w+\s*\}\}/g)
+    if (!matches) return 0
+    const names = matches.map(m => m.replace(/\{\{\s*/, '').replace(/\s*\}\}/, ''))
+    return new Set(names).size
+}
+
 export function ViewPromptModal({ prompt, onClose }: { prompt: Prompt | null; onClose: () => void }) {
     if (!prompt) return null
+    const vc = varCount(prompt.template)
     return (
         <div
             className="plasmo-fixed plasmo-inset-0 plasmo-z-50 plasmo-flex plasmo-items-center plasmo-justify-center plasmo-p-4 modal-overlay"
@@ -20,6 +28,11 @@ export function ViewPromptModal({ prompt, onClose }: { prompt: Prompt | null; on
                             <span className="plasmo-text-[14px] plasmo-font-semibold plasmo-text-[var(--text)]">
                                 /{prompt.label}
                             </span>
+                            {vc > 0 && (
+                                <span className="plasmo-text-[11px] plasmo-text-[var(--dim)]">
+                                    · {vc} var{vc > 1 ? "s" : ""}
+                                </span>
+                            )}
                         </div>
                         <button onClick={onClose} className="plasmo-flex plasmo-h-8 plasmo-w-8 plasmo-items-center plasmo-justify-center plasmo-text-[var(--muted)] plasmo-transition-colors hover:plasmo-bg-[var(--hover)] hover:plasmo-text-[var(--text)]">
                             <Icons.x />

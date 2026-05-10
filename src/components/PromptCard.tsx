@@ -1,27 +1,36 @@
 import type { Prompt } from "~types"
 import { Icons } from "~components/Icons"
 
+function varCount(template: string): number {
+    const matches = template.match(/\{\{\s*\w+\s*\}\}/g)
+    if (!matches) return 0
+    const names = matches.map(m => m.replace(/\{\{\s*/, '').replace(/\s*\}\}/, ''))
+    return new Set(names).size
+}
+
 export function PromptCard({
     prompt, onCopy, onEdit, onDelete, onView, copiedId,
 }: {
     prompt: Prompt; onCopy: (p: Prompt) => void; onEdit: (p: Prompt) => void; onDelete: (id: string) => void; onView: (p: Prompt) => void; copiedId: string | null
 }) {
     const isCopied = copiedId === prompt.id
+    const vc = varCount(prompt.template)
     return (
         <div className="plasmo-group plasmo-relative plasmo-flex plasmo-flex-col  plasmo-border plasmo-border-[var(--border)] plasmo-bg-[var(--card)] plasmo-overflow-hidden plasmo-transition-all plasmo-duration-200 hover:plasmo-border-[var(--border-hover)] hover:plasmo-shadow-[0_8px_32px_var(--shadow)] hover:plasmo--translate-y-0.5">
             <div className="plasmo-flex plasmo-items-start plasmo-justify-between plasmo-gap-2 plasmo-px-4 plasmo-pt-3 plasmo-pb-2">
                 <div className="plasmo-min-w-0 plasmo-flex-1">
                     <div className="plasmo-flex plasmo-items-center plasmo-gap-1.5">
-                        <span className="plasmo-text-[13px] plasmo-font-semibold plasmo-text-[var(--accent)] plasmo-bg-[var(--accent-bg)] plasmo-px-1 plasmo-py-0.5">
+                        <span className="plasmo-text-[13px] plasmo-font-semibold plasmo-text-[var(--accent)] plasmo-bg-[var(--accent-bg)] plasmo-px-1 plasmo-py-0.5
+                        plasmo-text-ellipsis plasmo-overflow-hidden plasmo-whitespace-nowrap
+                        ">
                             /{prompt.label}
                         </span>
                     </div>
 
-                    {prompt.description && (
-                        <p className="plasmo-mt-0.5 plasmo-text-[11px] plasmo-text-[var(--muted)] plasmo-line-clamp-1">
-                            {prompt.description}
-                        </p>
-                    )}
+                    <p className="plasmo-mt-0.5 plasmo-text-[11px] plasmo-text-[var(--muted)] plasmo-line-clamp-1">
+
+                        {prompt.description || ""}
+                    </p>
                 </div>
 
                 <div className="plasmo-flex plasmo-shrink-0 plasmo-items-center plasmo-gap-0 plasmo-opacity-0 group-hover:plasmo-opacity-100 plasmo-transition-opacity">
@@ -53,6 +62,7 @@ export function PromptCard({
             </div>
 
             <div className="plasmo-mb-3 plasmo-min-w-[260px]">
+
                 <pre
                     className="
       plasmo-px-3 plasmo-py-3
@@ -78,6 +88,7 @@ export function PromptCard({
                 >
                     {prompt.template}
                 </pre>
+
             </div>
 
             <div className="plasmo-px-4 plasmo-pb-3 plasmo-mt-auto">
