@@ -13,7 +13,7 @@
     "build:chrome": "plasmo build --target=chrome-mv3 --zip",
     "build:firefox": "plasmo build --target=firefox-mv3 --zip --source-maps",
     "package": "plasmo package",
-    "build:all": "pnpm run build:chrome && pnpm run build:firefox"
+    "build:all": "npm run build:chrome && npm run build:firefox"
   },
   "dependencies": {
     "@plasmohq/storage": "^1.15.0",
