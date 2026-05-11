@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState } from "react"
+import { Fragment, useEffect, useMemo, useRef, useState } from "react"
 import { Storage } from "@plasmohq/storage"
 import "./style.css";
 import Logo from "~components/Logo";
@@ -485,7 +485,7 @@ function OptionsIndex() {
                 ) : (
                     <div className="plasmo-flex plasmo-flex-col plasmo-border plasmo-border-[var(--border)] divide-y divide-[var(--border)] plasmo-bg-[var(--card)]">
                         {filteredPrompts.map((p, index) => (
-                            <React.Fragment key={p.id}>
+                            <Fragment key={p.id}>
                                 <PromptRow
                                     prompt={p}
                                     onCopy={handleCopy}
@@ -498,7 +498,7 @@ function OptionsIndex() {
                                 {
                                     index !== filteredPrompts.length - 1 && <hr className="plasmo-border-t plasmo-border-[var(--border)] plasmo-m-0" />
                                 }
-                            </React.Fragment>
+                            </Fragment>
                         ))}
                     </div>
                 )}
