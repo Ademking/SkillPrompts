@@ -2,7 +2,7 @@
   "name": "skillprompts",
   "displayName": "SkillPrompts",
   "version": "1.0.0",
-  "description": "A browser extension to create, organize, and reuse customizable AI prompts across multiple AI chat platforms for faster, more efficient interactions.",
+  "description": "Boost your AI workflow. Create, organize, and reuse prompts instantly across all your favorite chat platforms.",
   "author": "Adem Kouki <ademkingnew@gmail.com>",
   "scripts": {
     "dev": "plasmo dev",
