@@ -331,7 +331,7 @@ function OptionsIndex() {
                                     </a>
                                 </p>
                                 <p className="plasmo-text-[12.5px] plasmo-text-[var(--muted)] plasmo-text-center plasmo-leading-relaxed">
-                                    Made with ❤️ by <a href="#" target="_blank" className="plasmo-text-amber-400 hover:plasmo-underline">Adem Kouki</a> for everyone who loves using AI prompts.
+                                    Made with ❤️ by <a href="https://github.com/Ademking" target="_blank" className="plasmo-text-amber-400 hover:plasmo-underline">Adem Kouki</a> for everyone who loves using AI prompts.
                                 </p>
                             </div>
                             <div className="plasmo-flex plasmo-items-center plasmo-justify-center plasmo-px-6 plasmo-py-3 plasmo-border-t plasmo-border-[var(--border)] plasmo-bg-[var(--hover)]">
