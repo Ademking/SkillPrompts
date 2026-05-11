@@ -15,20 +15,34 @@ export function VariableModal({
     onSubmit: (values: Record<string, string>) => void
     onClose: () => void
 }) {
-    const [values, setValues] = useState<Record<string, string>>({})
     const [focusedIdx, setFocusedIdx] = useState(0)
     const inputRefs = useRef<(HTMLInputElement | null)[]>([])
+    const isFirefox = navigator.userAgent.includes("Firefox")
 
     useEffect(() => {
-        inputRefs.current[focusedIdx]?.focus()
+        const input = inputRefs.current[focusedIdx]
+        if (input) input.focus()
+        requestAnimationFrame(() => {
+            requestAnimationFrame(() => {
+                inputRefs.current[focusedIdx]?.focus()
+            })
+        })
     }, [focusedIdx])
+
+    useEffect(() => {
+        if (!isFirefox) return
+        const input = inputRefs.current[focusedIdx]
+        if (input && document.activeElement !== input) {
+            input.focus()
+        }
+    })
 
     const D = theme === "dark"
 
     const handleSubmit = () => {
         const filled: Record<string, string> = {}
-        for (const v of variables) {
-            filled[v] = values[v] || ""
+        for (let i = 0; i < variables.length; i++) {
+            filled[variables[i]] = inputRefs.current[i]?.value || ""
         }
         onSubmit(filled)
     }
@@ -109,9 +123,14 @@ export function VariableModal({
                                     </label>
                                     <input
                                         ref={el => { inputRefs.current[i] = el }}
-                                        value={values[v] || ""}
-                                        onChange={e => setValues(x => ({ ...x, [v]: e.target.value }))}
+                                        defaultValue=""
                                         onFocus={() => setFocusedIdx(i)}
+                                        onBlur={isFirefox ? (e) => {
+                                            const related = e.relatedTarget as HTMLElement | null
+                                            if (related?.isContentEditable) {
+                                                (e.currentTarget as HTMLInputElement).focus()
+                                            }
+                                        } : undefined}
                                         placeholder={`Enter ${v}...`}
                                         className={`plasmo-w-full plasmo-px-3 plasmo-py-2 plasmo-text-sm plasmo-outline-none plasmo-transition-all plasmo-duration-150 ${D
                                             ? "plasmo-bg-white/5 plasmo-border plasmo-border-white/10 plasmo-text-white placeholder:plasmo-text-neutral-500 focus:plasmo-border-blue-500/50"
