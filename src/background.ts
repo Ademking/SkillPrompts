@@ -1,15 +1,25 @@
 import { Storage } from "@plasmohq/storage"
-import type { LibraryPrompt } from "~types"
+
 import libraryPrompts from "~prompts.json"
+import type { LibraryPrompt } from "~types"
 
 export {}
 
 const PROMPTS_STORAGE_KEY = "skillprompts_prompts"
 
 const DEFAULT_LABELS = new Set([
-  "blog", "debug", "email", "tldr", "ideas",
-  "formalizer", "explain", "corrector", "email-improver",
-  "linkedin-post", "facebook-post"
+  "blog",
+  "debug",
+  "email",
+  "tldr",
+  "ideas",
+  "formalizer",
+  "explain",
+  "corrector",
+  "email-improver",
+  "linkedin-post",
+  "facebook-post",
+  "translate-to"
 ])
 
 async function seedDefaultPrompts() {
@@ -18,7 +28,7 @@ async function seedDefaultPrompts() {
   if (existing && Array.isArray(existing) && existing.length > 0) return
 
   const defaults = (libraryPrompts as LibraryPrompt[])
-    .filter(p => DEFAULT_LABELS.has(p.label))
+    .filter((p) => DEFAULT_LABELS.has(p.label))
     .map((p, i) => ({
       id: String(Date.now() + i),
       label: p.label,

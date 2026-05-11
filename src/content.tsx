@@ -643,8 +643,11 @@ const CommandPaletteUI = () => {
           target.isContentEditable
         ) {
           event.preventDefault()
-          event.stopPropagation()
-          event.stopImmediatePropagation()
+
+          if (!navigator.userAgent.includes("Firefox")) {
+            event.stopPropagation()
+            event.stopImmediatePropagation()
+          }
           targetRef.current = target
 
           if (target instanceof HTMLInputElement || target instanceof HTMLTextAreaElement) {
@@ -680,6 +683,15 @@ const CommandPaletteUI = () => {
           //hideDefaultMenu()
           setIsVisible(true)
           setInputValue("")
+
+          requestAnimationFrame(() => {
+            requestAnimationFrame(() => {
+              const input = document.querySelector(
+                'input[placeholder="Search AI skills..."]'
+              ) as HTMLInputElement | null
+              input?.focus()
+            })
+          })
         }
       }
 
@@ -690,6 +702,8 @@ const CommandPaletteUI = () => {
 
     const handleBeforeInput = (event: InputEvent) => {
       if (!isEnabled) return
+      const target = event.target as HTMLElement
+      if (paletteRef.current?.contains(target)) return
       if (event.data === "/") {
         event.preventDefault()
       }
@@ -697,6 +711,8 @@ const CommandPaletteUI = () => {
 
     const handleKeyUp = (event: KeyboardEvent) => {
       if (!isEnabled) return
+      const target = event.target as HTMLElement
+      if (paletteRef.current?.contains(target)) return
       if (event.key === "/") {
         event.preventDefault()
         event.stopPropagation()
@@ -797,7 +813,9 @@ const CommandPaletteUI = () => {
       target.dispatchEvent(new Event("input", { bubbles: true }))
       target.dispatchEvent(new Event("change", { bubbles: true }))
     } else if (target?.isContentEditable) {
-      target.focus()
+      if (!navigator.userAgent.includes("Firefox")) {
+        target.focus()
+      }
       const range = contentEditableRangeRef.current
 
       if (range) {

@@ -39,7 +39,21 @@ const CommandPalette: FC<Props> = ({
     const selectedItemRef = useRef<HTMLButtonElement>(null)
     const isDark = theme === "dark"
 
-    useEffect(() => { inputRef.current?.focus() }, [])
+    useEffect(() => {
+      requestAnimationFrame(() => {
+        requestAnimationFrame(() => {
+          inputRef.current?.focus()
+        })
+      })
+    }, [])
+
+    useEffect(() => {
+      if (!navigator.userAgent.includes("Firefox")) return
+      const input = inputRef.current
+      if (input && document.activeElement !== input) {
+        input.focus()
+      }
+    })
     useEffect(() => {
         selectedItemRef.current?.scrollIntoView({ block: "nearest" })
     }, [selectedIndex])
@@ -89,7 +103,7 @@ const CommandPalette: FC<Props> = ({
                     <div className="plasmo-flex-1">
                         <input
                             ref={inputRef}
-                            value={searchValue}
+                            defaultValue={searchValue}
                             onChange={(e) => { onSearchChange(e.target.value); setSelectedIndex(0) }}
                             onKeyDown={(e) => {
                                 if (e.key === "ArrowDown") { e.preventDefault(); setSelectedIndex(p => p + 1 >= filtered.length ? 0 : p + 1) }
