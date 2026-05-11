@@ -37,18 +37,27 @@ These are not supported yet but are on the roadmap:
 - [ ] https://grok.com/
 - [ ] https://cursor.com/agents
 - [ ] https://claude.ai/
-  
+
 > More to be added based on user demand and feasibility.
 
 ## Installation
 
-1. Clone the repository or download the source code.
-2. Open your browser's extensions page (e.g., `chrome://extensions` for Chrome).
-3. Enable "Developer mode" (usually a toggle in the top right).
-4. Click "Load unpacked" and select the directory where you cloned/downloaded the extension.
-5. The extension should now be installed and ready to use.
-6. Open a supported AI chat platform and type `/` to see your prompts in action.
-7. Customize and manage your prompts through the extension's options page. Just click on the extension icon in your browser toolbar to access the options.
+### Chromium-based browsers (Chrome, Edge, Brave, etc.):
+
+1. Download the Chrome version from the releases page. [Click here to download](https://github.com/Ademking/SkillPrompts/releases/download/1.0.0/chrome-mv3-prod.zip)
+2. Unzip the downloaded file to a location on your computer.
+3. Open your browser and navigate to `chrome://extensions/`.
+4. Enable "Developer mode" using the toggle in the top right corner.
+5. Click "Load unpacked" and select the unzipped folder.
+6. The extension should now be installed and active. Go to a supported site and type `/` to see the prompt library.
+
+### Firefox:
+
+1. Download the Firefox version from the releases page. [Click here to download](https://github.com/Ademking/SkillPrompts/releases/download/1.0.0/firefox-mv3-prod.zip)
+2. Unzip the downloaded file to a location on your computer.
+3. Open Firefox and navigate to `about:debugging#/runtime/this-firefox`.
+4. Click "Load Temporary Add-on" and select the `manifest.json` file from the unzipped folder.
+5. The extension should now be installed and active. Go to a supported site and type `/` to see the prompt library.
 
 ## Contributing
 
