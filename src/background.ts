@@ -8,18 +8,22 @@ export {}
 const PROMPTS_STORAGE_KEY = "skillprompts_prompts"
 
 const DEFAULT_LABELS = new Set([
-  "blog",
-  "debug",
-  "email",
-  "tldr",
-  "ideas",
-  "formalizer",
-  "explain",
-  "corrector",
-  "email-improver",
-  "linkedin-post",
+  "viral-post",
   "facebook-post",
-  "translate-to"
+  "reddit-post",
+  "linkedin-post",
+  "debug",
+  "blog",
+  "formalizer",
+  "compare",
+  "expander",
+  "shortener",
+  "simplifier",
+  "ideas",
+  "translate-to",
+  "corrector",
+  "tldr",
+  "explain"
 ])
 
 async function seedDefaultPrompts() {
