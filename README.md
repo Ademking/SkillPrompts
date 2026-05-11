@@ -16,7 +16,6 @@ A browser extension to create, organize, and reuse customizable AI prompts acros
 
 https://github.com/user-attachments/assets/cb51fa3c-1dd8-44b9-80d8-9dbb0e39a983
 
-
 ## Supported Sites
 
 This extension is designed to work on various AI chat platforms. The following sites are currently supported:
@@ -38,7 +37,8 @@ These are not supported yet but are on the roadmap:
 - [ ] https://grok.com/
 - [ ] https://cursor.com/agents
 - [ ] https://claude.ai/
-- More to be added based on user demand and feasibility.
+  
+> More to be added based on user demand and feasibility.
 
 ## Installation
 
