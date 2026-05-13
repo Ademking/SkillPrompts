@@ -10,16 +10,18 @@ const isValidSlug = (slug: string): boolean => /^[a-z0-9_-]+$/.test(slug)
 export function FormModal({
     prompts,
     editingId,
+    initialData,
     onSave,
     onClose,
 }: {
     prompts: Prompt[]
     editingId: string | null
+    initialData?: Prompt
     onSave: (data: Prompt) => void
     onClose: () => void
 }) {
     const [formData, setFormData] = useState(
-        editingId ? prompts.find(p => p.id === editingId) || emptyForm : emptyForm
+        initialData || (editingId ? prompts.find(p => p.id === editingId) || emptyForm : emptyForm)
     )
     const [formErrors, setFormErrors] = useState({ label: false, labelInvalid: false, labelDuplicate: false, template: false })
     const labelRef = useRef<HTMLInputElement>(null)

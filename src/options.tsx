@@ -30,13 +30,17 @@ function OptionsIndex() {
     const [editingId, setEditingId] = useState<string | null>(null)
     const [viewPrompt, setViewPrompt] = useState<Prompt | null>(null)
     const [pendingDelete, setPendingDelete] = useState<Prompt | null>(null)
+    const [fetchedPrompt, setFetchedPrompt] = useState<Prompt | null>(null)
     const [showLibrary, setShowLibrary] = useState(false)
     const [showAbout, setShowAbout] = useState(false)
     const [showImportExport, setShowImportExport] = useState(false)
+    const [urlInput, setUrlInput] = useState("")
+    const [fetching, setFetching] = useState(false)
     const [searchTerm, setSearchTerm] = useState("")
     const [copiedId, setCopiedId] = useState<string | null>(null)
     const [toastVisible, setToastVisible] = useState(false)
     const [toastMessage, setToastMessage] = useState("Copied to clipboard")
+    const [toastError, setToastError] = useState(false)
     const [viewMode, setViewMode] = useState<"grid" | "list">("grid")
     const copiedTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null)
     const toastTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null)
@@ -116,8 +120,9 @@ function OptionsIndex() {
         return [...visiblePrompts].sort((a, b) => Number(b.id) - Number(a.id))
     }, [prompts, searchTerm])
 
-    const showToast = (message: string) => {
+    const showToast = (message: string, error?: boolean) => {
         setToastMessage(message)
+        setToastError(!!error)
         setToastVisible(true)
         if (toastTimeoutRef.current) clearTimeout(toastTimeoutRef.current)
         toastTimeoutRef.current = setTimeout(() => setToastVisible(false), 1800)
@@ -136,14 +141,14 @@ function OptionsIndex() {
         setShowForm(true)
     }
 
-    const closeForm = () => { setShowForm(false); setEditingId(null) }
+    const closeForm = () => { setShowForm(false); setEditingId(null); setFetchedPrompt(null) }
 
     const handleSave = async (data: Prompt) => {
         let updated: Prompt[]
         if (editingId) {
             updated = prompts.map(x => x.id === editingId ? { ...x, ...data } : x)
         } else {
-            updated = [...prompts, { ...data, id: String(Date.now()) }]
+            updated = [{ ...data, id: String(Date.now()) }, ...prompts]
         }
         setPrompts(updated)
         await storage.set(PROMPTS_STORAGE_KEY, updated)
@@ -172,7 +177,7 @@ function OptionsIndex() {
             description: lib.description,
             template: lib.prompt,
         }
-        const updated = [...prompts, newPrompt]
+        const updated = [newPrompt, ...prompts]
         setPrompts(updated)
         await storage.set(PROMPTS_STORAGE_KEY, updated)
         showToast(`Imported "${lib.label}"`)
@@ -188,6 +193,89 @@ function OptionsIndex() {
         a.click()
         URL.revokeObjectURL(url)
         showToast(`Exported ${prompts.length} prompts`)
+    }
+
+    const convertGithubUrl = (urlStr: string): string => {
+        try {
+            const url = new URL(urlStr)
+            if (url.hostname === "raw.githubusercontent.com" || url.hostname === "gist.githubusercontent.com")
+                return urlStr
+            if (url.hostname === "github.com") {
+                const m = url.pathname.match(/^\/([^\/]+)\/([^\/]+)\/blob\/([^\/]+)\/(.+)$/)
+                if (m)
+                    return `https://raw.githubusercontent.com/${m[1]}/${m[2]}/refs/heads/${m[3]}/${m[4]}`
+            }
+            if (url.hostname === "gist.github.com") {
+                const m = url.pathname.match(/^\/([^\/]+)\/([^\/]+)/)
+                if (m) {
+                    const hash = url.hash.match(/^#file-(.+)$/)
+                    if (hash)
+                        return `https://gist.githubusercontent.com/${m[1]}/${m[2]}/raw/${decodeURIComponent(hash[1])}`
+                    return `https://gist.githubusercontent.com/${m[1]}/${m[2]}/raw`
+                }
+            }
+            return urlStr
+        } catch {
+            return urlStr
+        }
+    }
+
+    const parseMarkdownToPrompt = (markdown: string): { label: string; description: string; template: string } => {
+        let label = ""
+        let description = ""
+        let template = markdown.trim()
+        const fm = markdown.match(/^---\s*\n([\s\S]*?)\n---\s*\n([\s\S]*)$/)
+        if (fm) {
+            const yaml = fm[1]
+            template = fm[2].trim()
+            const n = yaml.match(/^name:\s*(.+)$/m)
+            if (n) label = n[1].trim()
+            const d = yaml.match(/^description:\s*(.+)$/m)
+            if (d) description = d[1].trim()
+        }
+        if (!label) {
+            const h = (fm ? template : markdown).match(/^#\s+(.+)$/m)
+            if (h) label = h[1].trim()
+        }
+        if (!label) label = "Imported Skill"
+        if (!description) {
+            const p = template.match(/^([^\n]+)/)
+            if (p) description = p[1].trim().slice(0, 200)
+        }
+        return { label, description, template }
+    }
+
+    const handleImportFromUrl = async () => {
+        const raw = urlInput.trim()
+        if (!raw) return
+        setFetching(true)
+        try {
+            const targetUrl = convertGithubUrl(raw)
+            const res = await fetch(targetUrl)
+            if (!res.ok) throw new Error("Fetch failed")
+            const markdown = await res.text()
+            const parsed = parseMarkdownToPrompt(markdown)
+            const existingLabels = new Set(prompts.map((p) => p.label.toLowerCase()))
+            let label = parsed.label
+            if (existingLabels.has(label.toLowerCase())) {
+                let counter = 2
+                while (existingLabels.has(`${label}_${counter}`.toLowerCase())) counter++
+                label = `${label}_${counter}`
+            }
+            const newPrompt: Prompt = {
+                id: String(Date.now()) + String(Math.random()).slice(2, 8),
+                label,
+                description: parsed.description,
+                template: parsed.template,
+            }
+            setFetchedPrompt(newPrompt)
+            setShowForm(true)
+            setShowImportExport(false)
+            setUrlInput("")
+        } catch {
+            showToast("Failed to fetch URL", true)
+        }
+        setFetching(false)
     }
 
     const handleImport = async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -220,12 +308,12 @@ function OptionsIndex() {
                 }
             })
 
-            const updated = [...prompts, ...newPrompts]
+            const updated = [...newPrompts, ...prompts]
             setPrompts(updated)
             await storage.set(PROMPTS_STORAGE_KEY, updated)
             showToast(`Imported ${newPrompts.length} prompts`)
         } catch {
-            showToast("Invalid file format")
+            showToast("Invalid file format", true)
         }
         if (fileInputRef.current) fileInputRef.current.value = ""
     }
@@ -327,7 +415,7 @@ function OptionsIndex() {
             `}</style>
 
             {/* ── Toast ── */}
-            <Toast message={toastMessage} visible={toastVisible} />
+            <Toast message={toastMessage} visible={toastVisible} error={toastError} />
 
             {/* ── View Modal ── */}
             <ViewPromptModal prompt={viewPrompt} onClose={() => setViewPrompt(null)} />
@@ -346,6 +434,7 @@ function OptionsIndex() {
                 <FormModal
                     prompts={prompts}
                     editingId={editingId}
+                    initialData={fetchedPrompt}
                     onSave={handleSave}
                     onClose={closeForm}
                 />
@@ -368,25 +457,50 @@ function OptionsIndex() {
                     onClick={() => setShowImportExport(false)}
                 >
                     <div
-                        className="plasmo-w-full plasmo-max-w-xs modal-content"
+                        className="plasmo-w-full plasmo-max-w-sm modal-content"
                         onClick={(e) => e.stopPropagation()}
                     >
                         <div className="plasmo-border plasmo-border-[var(--border-hover)] plasmo-bg-[var(--card)] plasmo-shadow-[0_24px_64px_var(--shadow)] plasmo-overflow-hidden">
-                            <div className="plasmo-flex plasmo-flex-col plasmo-gap-2 plasmo-p-6">
+                            <div className="plasmo-flex plasmo-flex-col plasmo-gap-3 plasmo-p-6">
                                 <p className="plasmo-text-[14px] plasmo-font-semibold plasmo-text-[var(--text)]">Import / Export</p>
-                                <p className="plasmo-text-[12px] plasmo-text-[var(--muted)]">Export your prompts as JSON or import prompts from a file.</p>
-                                <div className="plasmo-flex plasmo-gap-2 plasmo-mt-2">
+
+                                <div className="plasmo-flex plasmo-gap-2">
                                     <button
                                         onClick={() => { setShowImportExport(false); fileInputRef.current?.click() }}
                                         className="plasmo-flex-1 plasmo-h-9 plasmo-flex plasmo-items-center plasmo-justify-center plasmo-gap-2 plasmo-border plasmo-border-[var(--border)] plasmo-text-[13px] plasmo-font-light plasmo-transition-all hover:plasmo-bg-[var(--hover)] active:plasmo-scale-[0.97]"
                                     >
-                                        <Icons.upload /> Import
+                                        <Icons.upload /> Import File
                                     </button>
                                     <button
                                         onClick={() => { handleExport(); setShowImportExport(false) }}
                                         className="plasmo-flex-1 plasmo-h-9 plasmo-flex plasmo-items-center plasmo-justify-center plasmo-gap-2 plasmo-border plasmo-border-[var(--border)] plasmo-text-[13px] plasmo-font-light plasmo-transition-all hover:plasmo-bg-[var(--hover)] active:plasmo-scale-[0.97]"
                                     >
                                         <Icons.download /> Export
+                                    </button>
+                                </div>
+
+                                <div className="plasmo-relative">
+                                    <div className="plasmo-absolute plasmo-inset-0 plasmo-flex plasmo-items-center">
+                                        <span className="plasmo-w-full plasmo-border-t plasmo-border-[var(--border)]" />
+                                    </div>
+                                    <div className="plasmo-relative plasmo-flex plasmo-justify-center">
+                                        <span className="plasmo-bg-[var(--card)] plasmo-px-2 plasmo-text-[11px] plasmo-text-[var(--dim)]">or import from URL</span>
+                                    </div>
+                                </div>
+
+                                <div className="plasmo-flex plasmo-gap-2">
+                                    <input
+                                        value={urlInput}
+                                        onChange={(e) => setUrlInput(e.target.value)}
+                                        placeholder="GitHub markdown URL..."
+                                        className="plasmo-flex-1 plasmo-px-3 plasmo-py-2 plasmo-border plasmo-border-[var(--border)] plasmo-bg-[var(--input-bg)] plasmo-text-[13px] plasmo-text-[var(--text)] plasmo-outline-none focus:plasmo-border-[var(--accent)] placeholder:plasmo-text-[var(--dim)]"
+                                    />
+                                    <button
+                                        onClick={handleImportFromUrl}
+                                        disabled={fetching || !urlInput.trim()}
+                                        className="plasmo-h-9 plasmo-px-4 plasmo-bg-[var(--accent)] plasmo-text-white plasmo-text-[13px] plasmo-font-light plasmo-transition-all hover:plasmo-opacity-90 active:plasmo-scale-[0.97] disabled:plasmo-opacity-40"
+                                    >
+                                        {fetching ? "..." : "Fetch"}
                                     </button>
                                 </div>
                             </div>
