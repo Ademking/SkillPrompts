@@ -570,7 +570,7 @@ function OptionsIndex() {
                                 <Logo width={56} height={56} color={isDark ? "var(--accent)" : "#148EFF"} />
                                 <div className="plasmo-text-center">
                                     <p className="plasmo-text-[18px] plasmo-font-semibold plasmo-text-[var(--text)]">SkillPrompts</p>
-                                    <p className="plasmo-text-[12px] plasmo-text-[var(--muted)] plasmo-mt-0.5">v1.0</p>
+                                    <p className="plasmo-text-[12px] plasmo-text-[var(--muted)] plasmo-mt-0.5">v1.1</p>
                                 </div>
                                 <p className="plasmo-text-[12.5px] plasmo-text-[var(--muted)] plasmo-text-center plasmo-leading-relaxed">
                                     A Chrome extension to manage and use AI skill prompts for ChatGPT. Create, organize, and quickly insert prompts with variables.
@@ -608,7 +608,7 @@ function OptionsIndex() {
                             <span className="plasmo-text-[20px] plasmo-tracking-tighter" style={{ color: isDark ? "#FFFFFF" : "#0F1117" }}>
                                 SkillPrompts
                             </span>
-                            <span className="plasmo-text-[11px] plasmo-text-[var(--muted)]">v1.0</span>
+                            <span className="plasmo-text-[11px] plasmo-text-[var(--muted)]">v1.1</span>
                         </div>
                     </div>
 
