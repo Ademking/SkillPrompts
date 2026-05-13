@@ -9,9 +9,9 @@ function varCount(template: string): number {
 }
 
 export function PromptCard({
-    prompt, onCopy, onEdit, onDelete, onView, copiedId, usage,
+    prompt, onCopy, onEdit, onDelete, onView, onToggleFavorite, copiedId, usage,
 }: {
-    prompt: Prompt; onCopy: (p: Prompt) => void; onEdit: (p: Prompt) => void; onDelete: (id: string) => void; onView: (p: Prompt) => void; copiedId: string | null; usage?: number
+    prompt: Prompt; onCopy: (p: Prompt) => void; onEdit: (p: Prompt) => void; onDelete: (id: string) => void; onView: (p: Prompt) => void; onToggleFavorite: (id: string) => void; copiedId: string | null; usage?: number
 }) {
     const isCopied = copiedId === prompt.id
     const vc = varCount(prompt.template)
@@ -20,7 +20,12 @@ export function PromptCard({
         <div className="plasmo-group plasmo-relative plasmo-flex plasmo-flex-col  plasmo-border plasmo-border-[var(--border)] plasmo-bg-[var(--card)] plasmo-overflow-hidden plasmo-transition-all plasmo-duration-200 hover:plasmo-border-[var(--border-hover)] hover:plasmo-shadow-[0_8px_32px_var(--shadow)] hover:plasmo--translate-y-0.5">
             <div className="plasmo-flex plasmo-items-start plasmo-justify-between plasmo-gap-2 plasmo-px-4 plasmo-pt-3 plasmo-pb-2">
                 <div className="plasmo-min-w-0 plasmo-flex-1">
-                    <div className="plasmo-flex plasmo-items-center plasmo-gap-1.5">
+                    <div className="plasmo-flex plasmo-items-center plasmo-gap-1">
+                        {prompt.favorite && (
+                            <span className="plasmo-text-amber-400 plasmo-flex plasmo-items-center">
+                                <Icons.starFill />
+                            </span>
+                        )}
                         <span className="plasmo-text-[13px] plasmo-font-semibold plasmo-text-[var(--accent)] plasmo-bg-[var(--accent-bg)] plasmo-px-1 plasmo-py-0.5
                         plasmo-text-ellipsis plasmo-overflow-hidden plasmo-whitespace-nowrap
                         ">
@@ -32,6 +37,13 @@ export function PromptCard({
                 </div>
 
                 <div className="plasmo-flex plasmo-shrink-0 plasmo-items-center plasmo-gap-0 plasmo-opacity-0 group-hover:plasmo-opacity-100 plasmo-transition-opacity">
+                    <button
+                        onClick={() => onToggleFavorite(prompt.id)}
+                        className={`plasmo-flex plasmo-h-6 plasmo-w-6 plasmo-items-center plasmo-justify-center plasmo-transition-colors ${prompt.favorite ? "plasmo-text-amber-400" : "plasmo-text-[var(--muted)] hover:plasmo-text-amber-400"}`}
+                        aria-label="Favorite"
+                    >
+                        {prompt.favorite ? <Icons.starFill /> : <Icons.star />}
+                    </button>
                     <button
                         onClick={() => onView(prompt)}
                         className="plasmo-flex plasmo-h-6 plasmo-w-6 plasmo-items-center plasmo-justify-center plasmo-text-[var(--muted)] hover:plasmo-bg-[var(--hover)] hover:plasmo-text-[var(--text)]"

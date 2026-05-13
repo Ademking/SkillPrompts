@@ -8,6 +8,7 @@ interface Command {
     label: string
     description: string
     template: string
+    favorite?: boolean
 }
 
 function renderTemplate(template: string, isDark: boolean) {
@@ -81,14 +82,21 @@ const CommandPalette: FC<Props> = ({
         id: c?.id ?? String(c),
         label: c?.label ?? c?.id ?? String(c),
         description: c?.description ?? "",
-        template: c?.template ?? ""
+        template: c?.template ?? "",
+        favorite: c?.favorite ?? false,
     }))
 
     const filtered = useMemo(() => {
-        if (!searchValue) return normalized
-        return normalized.filter(c =>
-            `${c.label} ${c.description}`.toLowerCase().includes(searchValue.toLowerCase())
-        )
+        let list = searchValue
+            ? normalized.filter(c =>
+                `${c.label} ${c.description}`.toLowerCase().includes(searchValue.toLowerCase())
+            )
+            : normalized
+        return [...list].sort((a, b) => {
+            if (a.favorite && !b.favorite) return -1
+            if (!a.favorite && b.favorite) return 1
+            return 0
+        })
     }, [searchValue, normalized])
 
     const selectCommand = (index: number) => {
@@ -202,7 +210,12 @@ const CommandPalette: FC<Props> = ({
                                         {active && <div className="plasmo-absolute plasmo-inset-y-0 plasmo-left-0 plasmo-w-0.5 " />}
 
                                         <div className="plasmo-min-w-0 plasmo-flex-1">
-                                            <div className="plasmo-flex plasmo-items-center plasmo-gap-1.5">
+                                            <div className="plasmo-flex plasmo-items-center plasmo-gap-1">
+                                                {cmd.favorite && (
+                                                    <span className="plasmo-text-amber-400 plasmo-flex plasmo-items-center">
+                                                        <Icons.starFill />
+                                                    </span>
+                                                )}
                                                 <span className="plasmo-text-xs plasmo-font-semibold plasmo-font-mono">/{cmd.label}</span>
                                                 {(() => {
                                                     const vc = extractVarCount(cmd.template)

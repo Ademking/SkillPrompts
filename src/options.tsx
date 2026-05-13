@@ -66,6 +66,8 @@ function OptionsIndex() {
                     }
                 }
 
+                nextPrompts = nextPrompts.map(p => ({ ...p, favorite: p.favorite ?? false }))
+
                 const savedTheme = await storage.get<"light" | "dark">(THEME_STORAGE_KEY)
                 const legacyTheme = window.localStorage.getItem(THEME_STORAGE_KEY)
                 const savedView = await storage.get<"grid" | "list">(VIEW_STORAGE_KEY)
@@ -148,7 +150,7 @@ function OptionsIndex() {
         if (editingId) {
             updated = prompts.map(x => x.id === editingId ? { ...x, ...data } : x)
         } else {
-            updated = [{ ...data, id: String(Date.now()) }, ...prompts]
+            updated = [{ ...data, id: String(Date.now()), favorite: false }, ...prompts]
         }
         setPrompts(updated)
         await storage.set(PROMPTS_STORAGE_KEY, updated)
@@ -168,6 +170,12 @@ function OptionsIndex() {
         setPendingDelete(null)
     }
 
+    const handleToggleFavorite = async (id: string) => {
+        const updated = prompts.map(p => p.id === id ? { ...p, favorite: !p.favorite } : p)
+        setPrompts(updated)
+        await storage.set(PROMPTS_STORAGE_KEY, updated)
+    }
+
     const existingLabels = useMemo(() => new Set(prompts.map(p => p.label.toLowerCase())), [prompts])
 
     const handleImportFromLibrary = async (lib: LibraryPrompt) => {
@@ -176,6 +184,7 @@ function OptionsIndex() {
             label: lib.label,
             description: lib.description,
             template: lib.prompt,
+            favorite: false,
         }
         const updated = [newPrompt, ...prompts]
         setPrompts(updated)
@@ -267,6 +276,7 @@ function OptionsIndex() {
                 label,
                 description: parsed.description,
                 template: parsed.template,
+                favorite: false,
             }
             setFetchedPrompt(newPrompt)
             setShowForm(true)
@@ -305,6 +315,7 @@ function OptionsIndex() {
                     label,
                     description: p.description || "",
                     template: p.template,
+                    favorite: false,
                 }
             })
 
@@ -469,7 +480,7 @@ function OptionsIndex() {
                                         onClick={() => { setShowImportExport(false); fileInputRef.current?.click() }}
                                         className="plasmo-flex-1 plasmo-h-9 plasmo-flex plasmo-items-center plasmo-justify-center plasmo-gap-2 plasmo-border plasmo-border-[var(--border)] plasmo-text-[13px] plasmo-font-light plasmo-transition-all hover:plasmo-bg-[var(--hover)] active:plasmo-scale-[0.97]"
                                     >
-                                        <Icons.upload /> Import File
+                                        <Icons.upload /> Import
                                     </button>
                                     <button
                                         onClick={() => { handleExport(); setShowImportExport(false) }}
@@ -486,6 +497,7 @@ function OptionsIndex() {
                                     <div className="plasmo-relative plasmo-flex plasmo-justify-center">
                                         <span className="plasmo-bg-[var(--card)] plasmo-px-2 plasmo-text-[11px] plasmo-text-[var(--dim)]">or import from URL</span>
                                     </div>
+
                                 </div>
 
                                 <div className="plasmo-flex plasmo-gap-2">
@@ -705,6 +717,7 @@ function OptionsIndex() {
                                 onEdit={openForm}
                                 onDelete={handleDelete}
                                 onView={setViewPrompt}
+                                onToggleFavorite={handleToggleFavorite}
                                 copiedId={copiedId}
                                 usage={usage[p.label]}
                             />
@@ -720,6 +733,7 @@ function OptionsIndex() {
                                     onEdit={openForm}
                                     onDelete={handleDelete}
                                     onView={setViewPrompt}
+                                    onToggleFavorite={handleToggleFavorite}
                                     copiedId={copiedId}
                                     usage={usage[p.label]}
                                 />

@@ -9,9 +9,9 @@ function varCount(template: string): number {
 }
 
 export function PromptRow({
-    prompt, onCopy, onEdit, onDelete, onView, copiedId, usage,
+    prompt, onCopy, onEdit, onDelete, onView, onToggleFavorite, copiedId, usage,
 }: {
-    prompt: Prompt; onCopy: (p: Prompt) => void; onEdit: (p: Prompt) => void; onDelete: (id: string) => void; onView: (p: Prompt) => void; copiedId: string | null; usage?: number
+    prompt: Prompt; onCopy: (p: Prompt) => void; onEdit: (p: Prompt) => void; onDelete: (id: string) => void; onView: (p: Prompt) => void; onToggleFavorite: (id: string) => void; copiedId: string | null; usage?: number
 }) {
     const isCopied = copiedId === prompt.id
     const vc = varCount(prompt.template)
@@ -20,7 +20,14 @@ export function PromptRow({
         <div className="plasmo-flex plasmo-items-stretch plasmo-min-h-0 plasmo-transition-colors plasmo-duration-150 hover:plasmo-bg-[var(--hover)]">
             <div className="plasmo-flex plasmo-items-start plasmo-gap-4 plasmo-px-5 plasmo-py-3.5 plasmo-flex-1 plasmo-min-w-0">
                 <div className="plasmo-min-w-0 plasmo-flex-[2]">
-                    <span className="plasmo-text-[14px] plasmo-font-semibold plasmo-text-[var(--accent)] plasmo-bg-[var(--accent-bg)] plasmo-px-1.5 plasmo-py-0.5">/{prompt.label}</span>
+                    <div className="plasmo-flex plasmo-items-center plasmo-gap-1">
+                        {prompt.favorite && (
+                            <span className="plasmo-text-amber-400 plasmo-flex plasmo-items-center">
+                                <Icons.starFill />
+                            </span>
+                        )}
+                        <span className="plasmo-text-[14px] plasmo-font-semibold plasmo-text-[var(--accent)] plasmo-bg-[var(--accent-bg)] plasmo-px-1.5 plasmo-py-0.5">/{prompt.label}</span>
+                    </div>
                     <p className="plasmo-text-[12px] plasmo-text-[var(--muted)] plasmo-mt-0.5 plasmo-truncate">{prompt.description || ""}</p>
                 </div>
 
@@ -49,6 +56,13 @@ export function PromptRow({
             </div>
 
             <div className="plasmo-flex plasmo-items-center plasmo-gap-0.5 plasmo-px-2 plasmo-border-l plasmo-border-[var(--border)]">
+                <button
+                    onClick={() => onToggleFavorite(prompt.id)}
+                    className={`plasmo-flex plasmo-h-8 plasmo-w-8 plasmo-items-center plasmo-justify-center plasmo-transition-colors ${prompt.favorite ? "plasmo-text-amber-400" : "plasmo-text-[var(--muted)] hover:plasmo-text-amber-400"}`}
+                    aria-label="Favorite"
+                >
+                    {prompt.favorite ? <Icons.starFill /> : <Icons.star />}
+                </button>
                 <button
                     onClick={() => onCopy(prompt)}
                     className={`plasmo-flex plasmo-h-8 plasmo-px-3 plasmo-items-center plasmo-justify-center plasmo-gap-1.5 plasmo-text-[11px] plasmo-font-medium plasmo-transition-all plasmo-duration-200 ${isCopied

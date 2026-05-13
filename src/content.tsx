@@ -906,7 +906,7 @@ const CommandPaletteUI = () => {
                   onClose={() => setIsVisible(false)}
                   theme={theme}
                   centered={true}
-                  commands={storedCommands.map(p => ({ id: p.label, label: p.label, description: p.description || "", template: p.template }))}
+                  commands={storedCommands.map(p => ({ id: p.label, label: p.label, description: p.description || "", template: p.template, favorite: p.favorite }))}
                 />
               ) : (
                 <div className={`plasmo-flex plasmo-items-center plasmo-justify-center plasmo-px-6 plasmo-py-4 plasmo-text-sm ${theme === "dark" ? "plasmo-text-neutral-400" : "plasmo-text-neutral-500"}`}>

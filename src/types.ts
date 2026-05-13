@@ -3,6 +3,7 @@ export interface Prompt {
     label: string
     description: string
     template: string
+    favorite?: boolean
 }
 
 export interface LibraryPrompt {
