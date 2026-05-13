@@ -38,6 +38,11 @@ export function LibraryModal({ onImport, onClose, existingLabels }: { onImport: 
                             <Icons.x />
                         </button>
                     </div>
+                    <div className="plasmo-px-5 plasmo-pt-3 plasmo-border-[var(--border)]">
+                        <span className="plasmo-text-[12px] plasmo-text-[var(--dim)]">
+                            Browse and import prompts from the library. You can customize them after importing.
+                        </span>
+                    </div>
                     <div className="plasmo-p-4 plasmo-border-b plasmo-border-[var(--border)]">
                         <div className="plasmo-relative">
                             <div className="plasmo-absolute plasmo-left-3 plasmo-top-1/2 plasmo--translate-y-1/2 plasmo-text-[var(--dim)] plasmo-pointer-events-none"><Icons.search /></div>

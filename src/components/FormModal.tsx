@@ -131,6 +131,11 @@ export function FormModal({
                         </button>
                     </div>
 
+                    <div className="plasmo-px-5 plasmo-pt-3 plasmo-border-[var(--border)]">
+                        <span className="plasmo-text-[12px] plasmo-text-[var(--dim)]">
+                            Fill in the details to {editingId ? "edit" : "create"} a new skill. Use variables in the template to make it dynamic.
+                        </span>
+                    </div>
                     {/* Form body */}
                     <div className="plasmo-p-5 plasmo-flex plasmo-flex-col plasmo-gap-4">
                         <div className="plasmo-grid plasmo-grid-cols-2 plasmo-gap-3.5">

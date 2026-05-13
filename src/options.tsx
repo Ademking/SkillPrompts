@@ -468,12 +468,16 @@ function OptionsIndex() {
                     onClick={() => setShowImportExport(false)}
                 >
                     <div
-                        className="plasmo-w-full plasmo-max-w-sm modal-content"
+                        className="plasmo-w-full plasmo-max-w-lg modal-content"
                         onClick={(e) => e.stopPropagation()}
                     >
                         <div className="plasmo-border plasmo-border-[var(--border-hover)] plasmo-bg-[var(--card)] plasmo-shadow-[0_24px_64px_var(--shadow)] plasmo-overflow-hidden">
                             <div className="plasmo-flex plasmo-flex-col plasmo-gap-3 plasmo-p-6">
                                 <p className="plasmo-text-[14px] plasmo-font-semibold plasmo-text-[var(--text)]">Import / Export</p>
+
+                                <div className="plasmo-text-[12px] plasmo-text-[var(--muted)]">
+                                    Import skills from a JSON file or export your current skills for backup or sharing. You can also import a single skill from a GitHub markdown URL.
+                                </div>
 
                                 <div className="plasmo-flex plasmo-gap-2">
                                     <button
@@ -537,7 +541,7 @@ function OptionsIndex() {
                     onClick={() => setShowAbout(false)}
                 >
                     <div
-                        className="plasmo-w-full plasmo-max-w-sm modal-content"
+                        className="plasmo-w-full plasmo-max-w-xl modal-content"
                         onClick={e => e.stopPropagation()}
                     >
                         <div className="plasmo-border plasmo-border-[var(--border-hover)] plasmo-bg-[var(--card)] plasmo-shadow-[0_24px_64px_var(--shadow)] plasmo-overflow-hidden">
