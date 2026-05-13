@@ -6,6 +6,12 @@ export interface Prompt {
     favorite?: boolean
 }
 
+export interface Block {
+    id: string
+    name: string
+    value: string
+}
+
 export interface LibraryPrompt {
     label: string
     description: string

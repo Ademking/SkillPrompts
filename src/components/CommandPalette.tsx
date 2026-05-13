@@ -2,6 +2,8 @@ import { useEffect, useMemo, useRef, useState } from "react"
 import type { FC } from "react"
 import Logo from "./Logo"
 import { Icons } from "./Icons"
+import type { Block } from "~types"
+import { resolveBlocks, blockNames } from "~utils"
 
 interface Command {
     id: string
@@ -11,10 +13,11 @@ interface Command {
     favorite?: boolean
 }
 
-function renderTemplate(template: string, isDark: boolean) {
-    const parts = template.split(/(\{\{\s*\w+\s*\}\})/g)
+function renderTemplate(template: string, isDark: boolean, blocks: Block[]) {
+    const resolved = resolveBlocks(template, blocks)
+    const parts = resolved.split(/(\{\{\s*[\w-]+\s*\}\})/g)
     return parts.map((part, i) => {
-        const match = part.match(/^\{\{\s*(\w+)\s*\}\}$/)
+        const match = part.match(/^\{\{\s*([\w-]+)\s*\}\}$/)
         if (match) {
             const cls = isDark
                 ? "plasmo-text-blue-300 plasmo-bg-blue-400/10"
@@ -29,11 +32,12 @@ function renderTemplate(template: string, isDark: boolean) {
     })
 }
 
-function extractVarCount(template: string): number {
-    const matches = template.match(/\{\{\s*\w+\s*\}\}/g)
+function extractVarCount(template: string, blocks: Block[]): number {
+    const bn = blockNames(blocks)
+    const matches = template.match(/\{\{\s*[\w-]+\s*\}\}/g)
     if (!matches) return 0
     const names = matches.map(m => m.replace(/\{\{\s*/, '').replace(/\s*\}\}/, ''))
-    return new Set(names).size
+    return new Set(names.filter(n => !bn.has(n.toLowerCase()))).size
 }
 
 const COMMANDS: Command[] = []
@@ -47,11 +51,12 @@ interface Props {
     theme?: "light" | "dark"
     centered?: boolean
     commands?: Command[]
+    blocks?: Block[]
 }
 
 const CommandPalette: FC<Props> = ({
     position, searchValue, onSearchChange, onCommandSelect, onClose,
-    theme = "dark", centered = false, commands
+    theme = "dark", centered = false, commands, blocks = []
 }) => {
     const [selectedIndex, setSelectedIndex] = useState(0)
     const inputRef = useRef<HTMLInputElement>(null)
@@ -218,7 +223,7 @@ const CommandPalette: FC<Props> = ({
                                                 )}
                                                 <span className="plasmo-text-xs plasmo-font-semibold plasmo-font-mono">/{cmd.label}</span>
                                                 {(() => {
-                                                    const vc = extractVarCount(cmd.template)
+                                                    const vc = extractVarCount(cmd.template, blocks)
                                                     if (vc === 0) return null
                                                     return (
                                                         <span className={`plasmo-px-1.5 plasmo-py-0 plasmo-text-[10px] plasmo-font-medium ${D ? "plasmo-bg-white/5 plasmo-text-neutral-400" : "plasmo-bg-neutral-200 plasmo-text-neutral-500"
@@ -249,7 +254,7 @@ const CommandPalette: FC<Props> = ({
                                     </div>
                                     {filtered[selectedIndex].template ? (
                                         <div className="plasmo-font-mono plasmo-text-[12px] plasmo-leading-relaxed plasmo-whitespace-pre-wrap plasmo-break-words">
-                                            {renderTemplate(filtered[selectedIndex].template, isDark)}
+                                            {renderTemplate(filtered[selectedIndex].template, isDark, blocks)}
                                         </div>
                                     ) : (
                                         <div className={`plasmo-text-[11px] ${textMuted}`}>

@@ -1,20 +1,22 @@
-import type { Prompt } from "~types"
+import type { Prompt, Block } from "~types"
 import { Icons } from "~components/Icons"
+import { resolveBlocks, blockNames } from "~utils"
 
-function varCount(template: string): number {
-    const matches = template.match(/\{\{\s*\w+\s*\}\}/g)
+function varCount(template: string, blocks: Block[]): number {
+    const resolved = resolveBlocks(template, blocks)
+    const matches = resolved.match(/\{\{\s*[\w-]+\s*\}\}/g)
     if (!matches) return 0
     const names = matches.map(m => m.replace(/\{\{\s*/, '').replace(/\s*\}\}/, ''))
     return new Set(names).size
 }
 
 export function PromptRow({
-    prompt, onCopy, onEdit, onDelete, onView, onToggleFavorite, copiedId, usage,
+    prompt, onCopy, onEdit, onDelete, onView, onToggleFavorite, copiedId, usage, blocks,
 }: {
-    prompt: Prompt; onCopy: (p: Prompt) => void; onEdit: (p: Prompt) => void; onDelete: (id: string) => void; onView: (p: Prompt) => void; onToggleFavorite: (id: string) => void; copiedId: string | null; usage?: number
+    prompt: Prompt; onCopy: (p: Prompt) => void; onEdit: (p: Prompt) => void; onDelete: (id: string) => void; onView: (p: Prompt) => void; onToggleFavorite: (id: string) => void; copiedId: string | null; usage?: number; blocks?: Block[]
 }) {
     const isCopied = copiedId === prompt.id
-    const vc = varCount(prompt.template)
+    const vc = varCount(prompt.template, blocks || [])
     const uc = usage || 0
     return (
         <div className="plasmo-flex plasmo-items-stretch plasmo-min-h-0 plasmo-transition-colors plasmo-duration-150 hover:plasmo-bg-[var(--hover)]">
@@ -33,8 +35,8 @@ export function PromptRow({
 
                 <div className="plasmo-flex-[3] plasmo-flex plasmo-flex-col plasmo-min-w-0">
                     <pre className="plasmo-min-w-0 plasmo-px-3.5 plasmo-py-1 plasmo-bg-[var(--code-bg)] plasmo-font-mono plasmo-text-[12px] plasmo-leading-relaxed plasmo-text-[var(--muted)] plasmo-overflow-hidden plasmo-truncate">
-                        {prompt.template.split(/(\{\{\s*\w+\s*\}\})/g).map((seg, i) => {
-                            const m = seg.match(/^\{\{\s*(\w+)\s*\}\}$/)
+                        {resolveBlocks(prompt.template, blocks || []).split(/(\{\{\s*[\w-]+\s*\}\})/g).map((seg, i) => {
+                            const m = seg.match(/^\{\{\s*([\w-]+)\s*\}\}$/)
                             if (m) {
                                 const name = m[1].toUpperCase()
                                 return <span key={i} className="plasmo-inline-flex plasmo-items-center plasmo-px-1.5 plasmo-py-0 plasmo-text-[10px] plasmo-font-semibold plasmo-leading-tight plasmo-bg-amber-500/15 plasmo-text-amber-400 plasmo-border plasmo-border-amber-500/20">{name}</span>

@@ -11,7 +11,6 @@ export function DeleteConfirmModal({
         <div
             className="plasmo-fixed plasmo-inset-0 plasmo-z-50 plasmo-flex plasmo-items-center plasmo-justify-center plasmo-p-4 modal-overlay"
             style={{ background: "rgba(0,0,0,0.6)", backdropFilter: "blur(8px)" }}
-            onClick={onClose}
         >
             <div
                 className="plasmo-w-full plasmo-max-w-sm modal-content"

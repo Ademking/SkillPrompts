@@ -25,7 +25,6 @@ export function FormModal({
     )
     const [formErrors, setFormErrors] = useState({ label: false, labelInvalid: false, labelDuplicate: false, template: false })
     const labelRef = useRef<HTMLInputElement>(null)
-    const modalRef = useRef<HTMLDivElement>(null)
     const templateRef = useRef<HTMLDivElement>(null)
     const highlightInitRef = useRef(false)
 
@@ -39,7 +38,7 @@ export function FormModal({
         if (!templateRef.current) return
         const el = templateRef.current
         const text = el.textContent || ""
-        const regex = /\{\{\s*\w+\s*\}\}/g
+        const regex = /\{\{\s*[\w-]+\s*\}\}/g
         const ranges: Range[] = []
         const walker = document.createTreeWalker(el, NodeFilter.SHOW_TEXT, null)
         const textNodes: Text[] = []
@@ -97,23 +96,14 @@ export function FormModal({
         }
     }
 
-    const handleBackdropClick = (e: React.MouseEvent) => {
-        if (modalRef.current && !modalRef.current.contains(e.target as Node)) {
-            onClose()
-        }
-    }
-
     const inputCls = `plasmo-w-full plasmo-px-3.5 plasmo-py-2.5  plasmo-border plasmo-border-[var(--border)] plasmo-bg-[var(--input-bg)] plasmo-text-[13px] plasmo-text-[var(--text)] plasmo-outline-none plasmo-transition-all plasmo-duration-150 focus:plasmo-border-[var(--accent)] focus:plasmo-ring-2 focus:plasmo-ring-[var(--accent-bg)] placeholder:plasmo-text-[var(--dim)]`
 
     return (
         <div
             className="plasmo-fixed plasmo-inset-0 plasmo-z-50 plasmo-flex plasmo-items-center plasmo-justify-center plasmo-p-4 modal-overlay"
             style={{ background: "rgba(0,0,0,0.6)", backdropFilter: "blur(8px)" }}
-            onClick={handleBackdropClick}
-            onKeyDown={handleKeyDown}
         >
             <div
-                ref={modalRef}
                 className="plasmo-w-full plasmo-max-w-4xl modal-content"
                 onClick={e => e.stopPropagation()}
             >
@@ -216,7 +206,8 @@ export function FormModal({
                                 data-placeholder="You are an expert at..."
                             ></div>
                             <p className="plasmo-mt-1.5 plasmo-text-[11px] plasmo-text-[var(--dim)]">
-                                Tip: Use <span className="plasmo-font-mono plasmo-text-amber-400">&#123;&#123;variable&#125;&#125;</span> to add variables to your prompt
+                                Tip: Use <span className="plasmo-font-mono plasmo-text-amber-400">&#123;&#123;variable&#125;&#125;</span> to insert variables or blocks.
+                                Variables are prompted when you use the prompt, allowing dynamic input each time. Blocks are reusable predefined snippets or values that you can create once and insert anywhere from the Blocks section.
                             </p>
                         </Field>
                     </div>

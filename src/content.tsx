@@ -5,6 +5,8 @@ import { Storage } from "@plasmohq/storage"
 import CommandPalette from "./components/CommandPalette"
 import { VariableModal } from "./components/VariableModal"
 import type { PlasmoCSConfig } from "plasmo"
+import type { Block } from "~types"
+import { resolveBlocks, blockNames } from "~utils"
 
 const styleElement = document.createElement("style")
 
@@ -34,14 +36,16 @@ export const getStyle = (): HTMLStyleElement => {
 const PROMPTS_STORAGE_KEY = "skillprompts_prompts"
 const ENABLED_STORAGE_KEY = "skillprompts_enabled"
 const USAGE_STORAGE_KEY = "skillprompts_usage"
+const BLOCKS_STORAGE_KEY = "skillprompts_blocks"
 
-function extractVariables(template: string): string[] {
-  const matches = template.match(/\{\{\s*(\w+)\s*\}\}/g)
-  if (!matches) return []
-  return [...new Set(matches.map(m => {
-    const trimmed = m.slice(2, -2).trim()
-    return trimmed
-  }))]
+function extractVariables(template: string, blocks?: Block[]): string[] {
+    const resolved = blocks ? resolveBlocks(template, blocks) : template
+    const matches = resolved.match(/\{\{\s*([\w-]+)\s*\}\}/g)
+    if (!matches) return []
+    return [...new Set(matches.map(m => {
+        const trimmed = m.slice(2, -2).trim()
+        return trimmed
+    }))]
 }
 
 type StoredPrompt = {
@@ -146,6 +150,7 @@ const CommandPaletteUI = () => {
   }
   const [storedCommands, setStoredCommands] = useState<StoredPrompt[]>([])
   const [hasLoadedCommands, setHasLoadedCommands] = useState(false)
+  const [blocks, setBlocks] = useState<Block[]>([])
   const [isEnabled, setIsEnabled] = useState(true)
   const [showVarModal, setShowVarModal] = useState(false)
   const [varModalLabel, setVarModalLabel] = useState("")
@@ -221,7 +226,7 @@ const CommandPaletteUI = () => {
               }
             }
 
-            const varRegex = /(\w+)="([^"]*)"/g
+            const varRegex = /([\w-]+)="([^"]*)"/g
             let vMatch
             while ((vMatch = varRegex.exec(text)) !== null) {
               const range = document.createRange()
@@ -278,7 +283,7 @@ const CommandPaletteUI = () => {
               }
             }
 
-            const varRegex = /(\w+)="([^"]*)"/g
+            const varRegex = /([\w-]+)="([^"]*)"/g
             let vMatch
             while ((vMatch = varRegex.exec(text)) !== null) {
               matches.push({ node: textNode, start: vMatch.index, end: vMatch.index + vMatch[0].length, type: 'var' })
@@ -374,23 +379,23 @@ const CommandPaletteUI = () => {
       const cmd = storedCommands.find(p => p.label === label)
       if (!cmd) return match
 
-      const varRegex = /(\w+)="([^"]*)"/g
+      const varRegex = /([\w-]+)="([^"]*)"/g
       const vars: Record<string, string> = {}
       let varMatch
       while ((varMatch = varRegex.exec(match)) !== null) {
         vars[varMatch[1]] = varMatch[2]
       }
 
-      const templateVars = extractVariables(cmd.template || "")
+      const templateVars = extractVariables(cmd.template || "", blocks)
       let result = cmd.template || ""
 
-      if (templateVars.length > 0) {
-        for (const vName of templateVars) {
-          const val = vars[vName] || ""
-          result = result.replace(new RegExp(`\\{\\{\\s*${vName}\\s*\\}\\}`, "g"), val)
-        }
-        result = result.replace(/\{\{\s*\w+\s*\}\}/g, "")
+      for (const vName of templateVars) {
+        const val = vars[vName] || ""
+        result = result.replace(new RegExp(`\\{\\{\\s*${vName}\\s*\\}\\}`, "g"), val)
       }
+
+      result = resolveBlocks(result, blocks)
+      result = result.replace(/\{\{\s*[\w-]+\s*\}\}/g, "")
 
       storage.get<Record<string, number>>(USAGE_STORAGE_KEY).then(usage => {
         const next = { ...(usage || {}), [label]: ((usage || {})[label] || 0) + 1 }
@@ -404,7 +409,7 @@ const CommandPaletteUI = () => {
       let updatedText = text
       for (const cmd of storedCommands) {
         const escapedLabel = cmd.label.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")
-        const pattern = `\\/${escapedLabel}(?:\\s+\\w+="[^"]*")*(?!\\S)`
+        const pattern = `\\/${escapedLabel}(?:\\s+[\\w-]+="[^"]*")*(?!\\S)`
         const regex = new RegExp(pattern, "g")
         updatedText = updatedText.replace(regex, (match) => expandCommand(match, cmd.label))
       }
@@ -577,9 +582,11 @@ const CommandPaletteUI = () => {
         }
 
         const savedEnabled = await storage.get<boolean>(ENABLED_STORAGE_KEY)
+        const savedBlocks = await storage.get<Block[]>(BLOCKS_STORAGE_KEY)
 
         if (!cancelled) {
           setStoredCommands(nextCommands)
+          setBlocks(Array.isArray(savedBlocks) ? savedBlocks : [])
           setHasLoadedCommands(true)
           if (savedEnabled !== undefined) setIsEnabled(savedEnabled)
         }
@@ -602,6 +609,9 @@ const CommandPaletteUI = () => {
       },
       [ENABLED_STORAGE_KEY]: (change: { newValue?: boolean }) => {
         setIsEnabled(change.newValue !== false)
+      },
+      [BLOCKS_STORAGE_KEY]: (change: { newValue?: Block[] }) => {
+        setBlocks(Array.isArray(change.newValue) ? change.newValue : [])
       }
     })
 
@@ -868,7 +878,7 @@ const CommandPaletteUI = () => {
     const cmd = storedCommands.find(p => p.label === label)
 
     if (cmd) {
-      const vars = extractVariables(cmd.template || "")
+      const vars = extractVariables(cmd.template || "", blocks)
       if (vars.length > 0) {
         setVarModalLabel(label)
         setVarModalTemplate(cmd.template || "")
@@ -907,6 +917,7 @@ const CommandPaletteUI = () => {
                   theme={theme}
                   centered={true}
                   commands={storedCommands.map(p => ({ id: p.label, label: p.label, description: p.description || "", template: p.template, favorite: p.favorite }))}
+                  blocks={blocks}
                 />
               ) : (
                 <div className={`plasmo-flex plasmo-items-center plasmo-justify-center plasmo-px-6 plasmo-py-4 plasmo-text-sm ${theme === "dark" ? "plasmo-text-neutral-400" : "plasmo-text-neutral-500"}`}>

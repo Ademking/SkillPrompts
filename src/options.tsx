@@ -2,7 +2,7 @@ import { Fragment, useEffect, useMemo, useRef, useState } from "react"
 import { Storage } from "@plasmohq/storage"
 import "./style.css";
 import Logo from "~components/Logo";
-import type { Prompt, LibraryPrompt } from "~types"
+import type { Prompt, LibraryPrompt, Block } from "~types"
 import { Toast } from "~components/Toast"
 import { ViewPromptModal } from "~components/ViewPromptModal"
 import { LibraryModal } from "~components/LibraryModal"
@@ -11,6 +11,7 @@ import { PromptRow } from "~components/PromptRow"
 import { ViewToggle } from "~components/ViewToggle"
 import { FormModal } from "~components/FormModal"
 import { DeleteConfirmModal } from "~components/DeleteConfirmModal"
+import { BlockModal } from "~components/BlockModal"
 import { Icons } from "~components/Icons"
 
 const PROMPTS_STORAGE_KEY = "skillprompts_prompts"
@@ -18,6 +19,7 @@ const THEME_STORAGE_KEY = "skillprompts_theme"
 const VIEW_STORAGE_KEY = "skillprompts_view"
 const ENABLED_STORAGE_KEY = "skillprompts_enabled"
 const USAGE_STORAGE_KEY = "skillprompts_usage"
+const BLOCKS_STORAGE_KEY = "skillprompts_blocks"
 
 function OptionsIndex() {
     const storage = useMemo(() => new Storage({ area: "local" }), [])
@@ -34,6 +36,8 @@ function OptionsIndex() {
     const [showLibrary, setShowLibrary] = useState(false)
     const [showAbout, setShowAbout] = useState(false)
     const [showImportExport, setShowImportExport] = useState(false)
+    const [showBlocks, setShowBlocks] = useState(false)
+    const [blocks, setBlocks] = useState<Block[]>([])
     const [urlInput, setUrlInput] = useState("")
     const [fetching, setFetching] = useState(false)
     const [searchTerm, setSearchTerm] = useState("")
@@ -73,9 +77,11 @@ function OptionsIndex() {
                 const savedView = await storage.get<"grid" | "list">(VIEW_STORAGE_KEY)
                 const savedEnabled = await storage.get<boolean>(ENABLED_STORAGE_KEY)
                 const savedUsage = await storage.get<Record<string, number>>(USAGE_STORAGE_KEY)
+                const savedBlocks = await storage.get<Block[]>(BLOCKS_STORAGE_KEY)
 
                 if (!cancelled) {
                     setPrompts(nextPrompts)
+                    setBlocks(Array.isArray(savedBlocks) ? savedBlocks : [])
                     setUsage(savedUsage || {})
                     const storedPreference = savedTheme ?? legacyTheme
                     setIsDark(storedPreference ? storedPreference === "dark" : true)
@@ -103,6 +109,9 @@ function OptionsIndex() {
             },
             [USAGE_STORAGE_KEY]: (change: { newValue?: Record<string, number> }) => {
                 setUsage(change.newValue || {})
+            },
+            [BLOCKS_STORAGE_KEY]: (change: { newValue?: Block[] }) => {
+                setBlocks(Array.isArray(change.newValue) ? change.newValue : [])
             }
         })
 
@@ -174,6 +183,11 @@ function OptionsIndex() {
         const updated = prompts.map(p => p.id === id ? { ...p, favorite: !p.favorite } : p)
         setPrompts(updated)
         await storage.set(PROMPTS_STORAGE_KEY, updated)
+    }
+
+    const handleSaveBlocks = async (next: Block[]) => {
+        setBlocks(next)
+        await storage.set(BLOCKS_STORAGE_KEY, next)
     }
 
     const existingLabels = useMemo(() => new Set(prompts.map(p => p.label.toLowerCase())), [prompts])
@@ -330,7 +344,7 @@ function OptionsIndex() {
     }
 
     const handleKeyDown = (e: React.KeyboardEvent) => {
-        if (e.key === "Escape") { closeForm(); setViewPrompt(null); setShowLibrary(false); setShowAbout(false); setShowImportExport(false) }
+        if (e.key === "Escape") { closeForm(); setViewPrompt(null); setShowLibrary(false); setShowAbout(false); setShowImportExport(false); setShowBlocks(false) }
     }
 
     const toggleView = () => {
@@ -429,7 +443,7 @@ function OptionsIndex() {
             <Toast message={toastMessage} visible={toastVisible} error={toastError} />
 
             {/* ── View Modal ── */}
-            <ViewPromptModal prompt={viewPrompt} onClose={() => setViewPrompt(null)} />
+            <ViewPromptModal prompt={viewPrompt} onClose={() => setViewPrompt(null)} blocks={blocks} />
 
             {/* ── Library Modal ── */}
             {showLibrary && (
@@ -465,7 +479,6 @@ function OptionsIndex() {
                 <div
                     className="plasmo-fixed plasmo-inset-0 plasmo-z-50 plasmo-flex plasmo-items-center plasmo-justify-center plasmo-p-4 modal-overlay"
                     style={{ background: "rgba(0,0,0,0.6)", backdropFilter: "blur(8px)" }}
-                    onClick={() => setShowImportExport(false)}
                 >
                     <div
                         className="plasmo-w-full plasmo-max-w-lg modal-content"
@@ -533,12 +546,20 @@ function OptionsIndex() {
                 </div>
             )}
 
+            {/* ── Blocks Modal ── */}
+            {showBlocks && (
+                <BlockModal
+                    blocks={blocks}
+                    onSave={handleSaveBlocks}
+                    onClose={() => setShowBlocks(false)}
+                />
+            )}
+
             {/* ── About Modal ── */}
             {showAbout && (
                 <div
                     className="plasmo-fixed plasmo-inset-0 plasmo-z-50 plasmo-flex plasmo-items-center plasmo-justify-center plasmo-p-4 modal-overlay"
                     style={{ background: "rgba(0,0,0,0.6)", backdropFilter: "blur(8px)" }}
-                    onClick={() => setShowAbout(false)}
                 >
                     <div
                         className="plasmo-w-full plasmo-max-w-xl modal-content"
@@ -603,7 +624,7 @@ function OptionsIndex() {
                             onClick={() => setShowLibrary(true)}
                             className="plasmo-inline-flex plasmo-items-center plasmo-gap-2 plasmo-h-9 plasmo-px-4 plasmo-border plasmo-border-[var(--border)] plasmo-text-[13px] plasmo-font-light plasmo-transition-all hover:plasmo-opacity-90 active:plasmo-scale-[0.97]"
                         >
-                            <Icons.folder /> Explore Skills
+                            <Icons.folder /> Library
                         </button>
 
                         <input
@@ -619,7 +640,12 @@ function OptionsIndex() {
                         >
                             <Icons.download /> Import / Export
                         </button>
-
+                        <button
+                            onClick={() => setShowBlocks(true)}
+                            className="plasmo-inline-flex plasmo-items-center plasmo-gap-2 plasmo-h-9 plasmo-px-4 plasmo-border plasmo-border-[var(--border)] plasmo-text-[13px] plasmo-font-light plasmo-transition-all hover:plasmo-opacity-90 active:plasmo-scale-[0.97]"
+                        >
+                            <Icons.cube /> Blocks
+                        </button>
                         <button
                             onClick={() => setShowAbout(true)}
                             className="plasmo-inline-flex plasmo-items-center plasmo-gap-2 plasmo-h-9 plasmo-px-4 plasmo-border plasmo-border-[var(--border)] plasmo-text-[13px] plasmo-font-light plasmo-transition-all hover:plasmo-opacity-90 active:plasmo-scale-[0.97]"
@@ -706,7 +732,7 @@ function OptionsIndex() {
                                     onClick={() => setShowLibrary(true)}
                                     className="plasmo-inline-flex plasmo-items-center plasmo-gap-2 plasmo-h-9 plasmo-px-4 plasmo-border plasmo-border-[var(--border)] plasmo-text-[13px] plasmo-font-light plasmo-transition-all hover:plasmo-opacity-90 active:plasmo-scale-[0.97]"
                                 >
-                                    <Icons.folder /> Explore Skills
+                                    <Icons.folder /> Library
                                 </button>
                             </div>
                         )}
@@ -722,6 +748,7 @@ function OptionsIndex() {
                                 onDelete={handleDelete}
                                 onView={setViewPrompt}
                                 onToggleFavorite={handleToggleFavorite}
+                                blocks={blocks}
                                 copiedId={copiedId}
                                 usage={usage[p.label]}
                             />
@@ -738,6 +765,7 @@ function OptionsIndex() {
                                     onDelete={handleDelete}
                                     onView={setViewPrompt}
                                     onToggleFavorite={handleToggleFavorite}
+                                    blocks={blocks}
                                     copiedId={copiedId}
                                     usage={usage[p.label]}
                                 />

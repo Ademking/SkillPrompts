@@ -1,21 +1,22 @@
-import type { Prompt } from "~types"
+import type { Prompt, Block } from "~types"
 import { Icons } from "~components/Icons"
+import { resolveBlocks, blockNames } from "~utils"
 
-function varCount(template: string): number {
-    const matches = template.match(/\{\{\s*\w+\s*\}\}/g)
+function varCount(template: string, blocks: Block[]): number {
+    const resolved = resolveBlocks(template, blocks)
+    const matches = resolved.match(/\{\{\s*[\w-]+\s*\}\}/g)
     if (!matches) return 0
     const names = matches.map(m => m.replace(/\{\{\s*/, '').replace(/\s*\}\}/, ''))
     return new Set(names).size
 }
 
-export function ViewPromptModal({ prompt, onClose }: { prompt: Prompt | null; onClose: () => void }) {
+export function ViewPromptModal({ prompt, onClose, blocks = [] }: { prompt: Prompt | null; onClose: () => void; blocks?: Block[] }) {
     if (!prompt) return null
-    const vc = varCount(prompt.template)
+    const vc = varCount(prompt.template, blocks)
     return (
         <div
             className="plasmo-fixed plasmo-inset-0 plasmo-z-50 plasmo-flex plasmo-items-center plasmo-justify-center plasmo-p-4 modal-overlay"
             style={{ background: "rgba(0,0,0,0.6)", backdropFilter: "blur(8px)" }}
-            onClick={onClose}
         >
             <div
                 className="plasmo-w-full plasmo-max-w-2xl modal-content"
@@ -52,8 +53,8 @@ export function ViewPromptModal({ prompt, onClose }: { prompt: Prompt | null; on
                         <div>
                             <label className="plasmo-text-[11px] plasmo-font-medium plasmo-text-[var(--muted)] plasmo-uppercase plasmo-tracking-widest plasmo-block plasmo-mb-1.5">Prompt</label>
                             <pre className="plasmo-px-4 plasmo-py-3 plasmo-bg-[var(--code-bg)] plasmo-font-mono plasmo-text-[12px] plasmo-leading-relaxed plasmo-text-[var(--text)] plasmo-border plasmo-border-[var(--border)] plasmo-overflow-auto plasmo-max-h-[400px] plasmo-whitespace-pre-wrap plasmo-break-words plasmo-scrollbar-thin" style={{ whiteSpace: "pre-wrap", wordBreak: "break-word" }}>
-                                {prompt.template.split(/(\{\{\s*\w+\s*\}\})/g).map((seg, i) => {
-                                    const m = seg.match(/^\{\{\s*(\w+)\s*\}\}$/)
+                                {resolveBlocks(prompt.template, blocks).split(/(\{\{\s*[\w-]+\s*\}\})/g).map((seg, i) => {
+                                    const m = seg.match(/^\{\{\s*([\w-]+)\s*\}\}$/)
                                     if (m) {
                                         const name = m[1].toUpperCase()
                                         return <span key={i} className="plasmo-inline-flex plasmo-items-center plasmo-px-1.5 plasmo-py-0 plasmo-text-[10px] plasmo-font-semibold plasmo-leading-tight plasmo-bg-amber-500/15 plasmo-text-amber-400 plasmo-border plasmo-border-amber-500/20">{name}</span>
