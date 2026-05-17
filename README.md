@@ -4,6 +4,18 @@
 
 <h1 align="center">SkillPrompts</h1>
 
+<div align="center"><a href="https://chromewebstore.google.com/detail/skillprompts/lmonnhccbnchmhgpdmfllmallciokckl"><img src="https://raw.githubusercontent.com/Ademking/BetterViewer/master/docs/download-chrome.svg"></a>
+  <a href="https://addons.mozilla.org/en-US/firefox/addon/skillprompts/"><img src="https://raw.githubusercontent.com/Ademking/BetterViewer/master/docs/firefox.svg"></a>
+</div>
+
+<div align="center">
+  <img src="https://img.shields.io/github/release/Ademking/SkillPrompts?style=for-the-badge&sort=semver">
+  <img src="https://img.shields.io/github/stars/Ademking/SkillPrompts?style=for-the-badge&sort=semver">
+  <img src="https://img.shields.io/chrome-web-store/rating/lmonnhccbnchmhgpdmfllmallciokckl?style=for-the-badge">
+</div>
+
+<br/>
+
 A browser extension to create, organize, and reuse customizable AI prompts across multiple AI chat platforms for faster, more efficient interactions.
 
 ## Features
